@@ -201,7 +201,7 @@ function WalletPicker ({ onEnable }) {
           <div className={styles.Title}>
             <br/>
             <br/>Welcome, explorer, to Hashcast, a simple messaging layer for Plasma. Athough Hashcast is 
-            primarily designed to facilitatite inter-chain and cross-chain coordination, we are releasing 
+            primarily designed to facilitate inter-chain and cross-chain coordination, we are releasing 
             this simple frontend to make it easy to explore and use the system.
             <br/>
             <br/>
