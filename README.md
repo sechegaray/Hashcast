@@ -1,4 +1,4 @@
-# HashCast
+# Hashcast
 
 Hashcast is like Twitter for computers. You can CAST (broadcast) many different types 
 of messages, ranging from simple strings ('Hello world!') to cryptographic payloads, such as 
