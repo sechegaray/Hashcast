@@ -1,0 +1,79 @@
+diff --git a/node_modules/@omisego/omg-js-childchain/src/childchain.js b/node_modules/@omisego/omg-js-childchain/src/childchain.js
+index 7a85267..afd25d5 100644
+--- a/node_modules/@omisego/omg-js-childchain/src/childchain.js
++++ b/node_modules/@omisego/omg-js-childchain/src/childchain.js
+@@ -307,6 +307,28 @@ class ChildChain {
+     })
+   }
+ 
++    /**
++   * Submit an Array of signed transactions to the watcher
++   *
++   * @method submitTransaction
++   * @param Array of [string, string, ...] with the encoded signed transactions, as returned by prepareTransactionBatch
++   * @return {Promise<Object>} promise that resolves with the submitted transactions
++   */
++  async submitTransactionBatch ( transactions ) {
++
++    //Joi.assert({ transactions }, submitTransactionsSchema)
++    //ToDo
++
++    const urlBatch = `https://development-watcher-rinkeby-lr.omg.network/transaction.batch_submit`
++
++    return rpcApi.post({
++      url: urlBatch,
++      body: { transactions },
++      proxyUrl: urlBatch, //this.watcherProxyUrl
++    })
++
++  }
++
+   /**
+    * Create, sign, build and submit a transaction to the childchain using raw privatekey
+    *
+@@ -354,6 +376,45 @@ class ChildChain {
+     return this.submitTransaction(signedTx)
+   }
+ 
++  async prepareTransactionBatch ({
++    fromAddress,
++    fromUtxos,
++    fromPrivateKeys,
++    payments,
++    fee,
++    metadata
++  }) {
++
++    Joi.assert({
++      fromAddress,
++      fromUtxos,
++      fromPrivateKeys,
++      payments,
++      fee,
++      metadata
++    }, sendTransactionSchema)
++
++    const _metadata = metadata
++      ? transaction.encodeMetadata(metadata)
++      : transaction.NULL_METADATA
++
++    const txBody = transaction.createTransactionBody({
++      fromAddress,
++      fromUtxos,
++      payments,
++      fee,
++      metadata: _metadata
++    })
++
++    const typedData = transaction.getTypedData(txBody, this.plasmaContractAddress)
++
++    const signatures = this.signTransaction(typedData, fromPrivateKeys)
++
++    const signedTx = this.buildSignedTransaction(typedData, signatures)
++
++    return signedTx
++  }
++
+   /**
+    * Merge utxos to a single output
+    *

@@ -1,0 +1,190 @@
+@import 'index.scss';
+
+.container { 
+  background-color: $bunnyRed;
+  padding: 7px;
+  box-sizing: border-box;
+  transition: all 200ms ease-in-out;
+  margin-bottom: 5px;
+  position: relative;
+  .pulsate {
+    background: blue;
+    animation: pulseAnimation 2s infinite;
+  }
+
+}
+
+.line {
+  color: $gray6;
+  font-size: 0.8em;
+  padding-Top: 3px;
+}
+
+.lineHC {
+  color: $gray6;
+  font-size: 0.8em;
+  padding-Top: 3px;
+}
+
+.decryptOpen {
+  animation: openDecryption 1s;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.decryptClose {
+  animation: closeDecryption 1s;
+  overflow: hidden;
+  max-height: 0px;
+}
+
+.decryptCloseInitial {
+  display: none;
+}
+
+@keyframes openDecryption {
+  0% {
+    max-height: 0px;
+  }
+  100% {
+    max-height: 150px;
+  }
+}
+
+@keyframes closeDecryption {
+  0% {
+    max-height: 150px;
+    margin-top: 10px;
+  }
+  100% {
+    max-height: 0px;
+    margin-top: 0px;
+  }
+}
+
+@keyframes pulseAnimation {
+  0% {
+    box-shadow: 0 0 0 0px yellow;
+    background: yellow
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(0, 0, 0, 0);
+    background: blue
+  }
+}
+
+.topBorder {
+  border-top: 2px solid $gray2;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.statusBar {
+  color: $gray6;
+  font-size: 0.8em;
+  font-family: 'MessinaMonoSemiBold';
+  padding-Top: 3px;
+  .statusGreen {
+    color: $green;
+  }
+  .statusRed {
+    color: $red;
+  }
+}
+
+.topInfoContainer {
+
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  .topLeftContainer {
+    width: 60%;
+    min-width: 180px;
+  }
+
+  .topLeftContainerHC {
+    width: 80%;
+    min-width: 180px;
+  }
+
+  .topRightContainer {
+
+    width: 60%;
+    max-width: calc(100% - 180px);
+    padding-left: 10px;
+    float: right;
+    display: flex;
+    justify-content: flex-end;
+
+    .buttonContainer {
+      display: inline-block;
+      margin-left: 10px;
+      margin-bottom: 10px;
+    }
+  }
+
+  .topRightContainerHC {
+
+    width: 20%;
+    max-width: calc(100% - 180px);
+    padding-left: 10px;
+    float: right;
+    display: flex;
+    justify-content: flex-end;
+
+    .buttonContainer {
+      display: inline-block;
+      margin-left: 10px;
+      margin-bottom: 10px;
+    }
+  }
+  
+  .topRightContainerSpecial {
+
+    width: 60%;
+    max-width: calc(100% - 180px);
+    padding-left: 10px;
+    float: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    .buttonContainer {
+      display: inline-block;
+      margin-left: 10px;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.alertContainer {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  background-color: $red;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottomRedInfoContainer {
+  background: $red;
+  color: white;
+  max-height: 200px;
+  padding: 3px;
+  margin-top: 3px;
+}
+
+.bottomGreenInfoContainer {
+  background: $gray6;
+  color: $gray2;
+  font-size: 0.8em;
+  max-height: 200px;
+  padding: 3px;
+  margin-top: 3px;
+}
