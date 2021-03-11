@@ -5,7 +5,7 @@ of messages, ranging from simple strings ('Hello world!') to cryptographic paylo
 Varna bids and atomic swap signatures. You can scan Plasma for these broadcasts, and if you 
 find something interesting, most hashes resolve to files that you can PULL (download).
 
-Hashcast allows all of us on Plasma to connect, trade, store stuff, 
+Hashcast allows all of us on Plasma to connect, trade, store things, 
 communicate, and exchange data. The latter capability is the starting 
 point for inter-process communication and synchronization, which is 
 needed for things like atomic swaps.
@@ -17,7 +17,7 @@ use it.
 ## Interesting/notable features of the code
 
 * Web3.js updated to 1.3.4
-* Added "@metamask/legacy-web3": "^2.0.0" for web3 injection since Metamask is EOLing their web3 injection
+* Added @metamask/legacy-web3 since Metamask is EOLing their web3 injection
 * Patch js-childchain to accommodate Web3.js 1.3.4
 * Demonstrates the use of UFOs "UnFinalized transaction Outputs" to quickly fire transactions from a client, based on rapid Child Chain returns of the output UTXOs (blocknumber and txindex) _before_ the transaction has been finalized. Although supported for a while, this feature has not been widely known/used. With the UFO approach, a more snappy user experience can be achieved, among other benefits. However, the client is then responsible for basic UTXO management (at least briefly). 
 
