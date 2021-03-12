@@ -48,6 +48,14 @@ const initialState = {
   verifyHashIDLoad: false,
   verifyHashIDError: null,
   verifyHashIDLoadIndicator: null,
+
+  currentHashcasetMessageHashID: null,
+
+  hashcastMessage: {},
+  hashcastMessageLoad: {},
+  hashcastMessageError: {},
+
+  hashcastMessageWaitingList: [],
 };
 
 function hashCastReducer (state = initialState, action) {
@@ -250,6 +258,52 @@ function hashCastReducer (state = initialState, action) {
         verifyHashIDLoad: false,
         verifyHashIDError: action.payload,
         verifyHashIDLoadIndicator: false,
+      }
+    case 'LOAD_HASHCAST_MESSAGE': 
+      return {
+        ...state,
+        currentHashcasetMessageHashID: action.payload.hashID,
+        hashcastMessageLoad: {
+          ...state.hashcastMessageLoad,
+          [action.payload.hashID]: true,
+        },
+        hashcastMessageError: {
+          ...state.hashcastMessageError,
+          [action.payload.hashID]: null,
+        },
+      }
+    case 'LOAD_HASHCAST_MESSAGE_SUCCESS': 
+      return {
+        ...state,
+        hashcastMessage: {
+          ...state.hashcastMessage,
+          [action.payload.hashID]: action.payload.hashcastMessage,
+        },
+        hashcastMessageLoad: {
+          ...state.hashcastMessageLoad,
+          [action.payload.hashID]: false,
+        },
+        hashcastMessageError: {
+          ...state.hashcastMessageError,
+          [action.payload.hashID]: false,
+        },
+      }
+    case 'LOAD_HASHCAST_MESSAGE_FAILURE': 
+      return {
+        ...state,
+        hashcastMessageLoad: {
+          ...state.hashcastMessageLoad,
+          [action.payload.hashID]: false,
+        },
+        hashcastMessageError: {
+          ...state.hashcastMessageError,
+          [action.payload.hashID]: action.payload.error,
+        },
+      }
+    case 'UPDATE_HASHCAST_MESSAGE_WAITING_LIST':
+      return {
+        ...state,
+        hashcastMessageWaitingList: action.payload,
       }
     default:
       return state;

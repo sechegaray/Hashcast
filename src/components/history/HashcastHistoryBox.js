@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import { isEqual } from 'lodash';
 
-import Button from 'components/button/Button';
+// import Button from 'components/button/Button';
 import { hashpullGetUrl } from 'actions/hashcastAction';
 
 import * as styles from './HistoryBox.module.scss';
@@ -51,9 +51,17 @@ class HashcastHistoryBox extends React.Component {
             <div className={styles.lineHC}>Block: {data.blockNum}</div>
             <div className={styles.lineHC}>Tag: {data.tag ? data.tag : 'Null' }</div>
             <div className={styles.lineHC}>{moment.unix(data.time).format('lll')}</div>
+            {data.hashcastMessage[data.msg] && 
+              <div className={styles.lineHC}>Message:{" "}
+                {data.hashcastMessage[data.msg].length > 100 ? 
+                  `${data.hashcastMessage[data.msg].slice(0, 100)}...` :
+                  `${data.hashcastMessage[data.msg]}`
+                }
+              </div>
+            }
           </div>
 
-          {/* Right part */}
+          {/* Right part
           {
             <div className={styles.topRightContainerHC}>
               <div className={styles.buttonContainer}>
@@ -68,7 +76,7 @@ class HashcastHistoryBox extends React.Component {
                 </Button>
               </div>
             </div>
-          }
+          } */}
         </div>
 
       </div>
