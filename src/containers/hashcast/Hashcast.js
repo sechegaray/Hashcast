@@ -413,7 +413,7 @@ class Hashcast extends React.Component {
         <div className={styles.leftBoxContainer}>
           <div className={styles.innerContainer}>
             <div className={styles.basictext}>
-              Enter your hashcast
+              Enter a simple text message...
             </div>
             <input
               value={simpleMessage}
@@ -423,7 +423,7 @@ class Hashcast extends React.Component {
               disabled={selectedFile}
             />
             <div className={styles.basictext}>
-              Select your image (max size 64kb)
+              Or, hashcast an image (max size 1MB)
             </div>
             <input 
               type="file" 
