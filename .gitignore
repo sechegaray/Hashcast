@@ -109,5 +109,5 @@ dist
 # yarn
 yarn.lock
 
-# env
-.env
+# generated runtime envs
+public/env.js
