@@ -26,6 +26,7 @@ import {
   findHashcaseWaitingList, 
   getHashcastMessage 
 } from 'actions/hashcastAction';
+import { checkVersion } from 'actions/versionAction';
 import Button from 'components/button/Button';
 import Pager from 'components/pager/Pager';
 import { parseVarna, findHashcasts, hashSlice } from 'util/transactionSort';
@@ -137,6 +138,8 @@ class Hashcast extends React.Component {
       ));
     }
 
+    this.props.dispatch(checkVersion());
+    
     this.setState({ transactions: sortedData.orderedTransactions });
   }
 
@@ -189,8 +192,9 @@ class Hashcast extends React.Component {
       //this means that you have either submitted a new item or a new bid,
       //so your Plasma transaction list has changed
       const sortedData = parseVarna(transaction);
+      const hashcasts = findHashcasts(transaction, verifiedHashID);
       this.props.dispatch(verifyHashID(sortedData.hashcastMeta));
-      this.setState({ transactions: sortedData.orderedTransactions });
+      this.setState({ transactions: sortedData.orderedTransactions, hashcasts });
     }
 
     if (!isEqual(prevState.hashcast.verifiedHashID, verifiedHashID)) {

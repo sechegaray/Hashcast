@@ -26,12 +26,12 @@ export const findHashcasts = (transaction, activeHashID) => {
   activeHashID.forEach(element => {
     const hashID = element.hashID;
     const filterTransactions = orderedTransactions.filter(i => i.metadata === hashID);
-    
+
     if (filterTransactions.length) {
       let hcID = 'pending';
       let time = Date.now();
       let blockNum = null;
-  
+
       if(typeof filterTransactions[0].block !== 'undefined') {
         if (typeof filterTransactions[0].block.hash !== 'undefined')
           hcID = filterTransactions[0].block.hash;

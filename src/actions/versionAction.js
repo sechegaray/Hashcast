@@ -20,7 +20,7 @@
 import { SERVICE_API_URL, VERSION } from 'Settings';
 
 export const checkVersion = () => (dispatch) => {
-  fetch(SERVICE_API_URL + 'version', {
+  fetch(SERVICE_API_URL + 'hashcastversion', {
     method: "GET",
     headers: {
       'Accept': 'application/json',
