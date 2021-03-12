@@ -25,10 +25,18 @@
   min-width: 300px;
 }
 
+.bottomBoxContainer {
+  display: inline-block;
+  padding: 5px;
+  width: 65%;
+  min-width: 300px;
+}
+
 .innerContainer {
   border: 2px solid $blue2;
   border-radius: 10px;
   padding: 10px;
+  margin-bottom: 10px;
 }
 
 .buttonsContainer {
@@ -62,6 +70,8 @@
   border-radius: .25rem;
   transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
   max-width: 460px;
+  font-size: 13px;
+  font-family: 'MessinaMono', monospace;
 }
 
 .input:focus {

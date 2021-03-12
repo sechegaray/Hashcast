@@ -40,7 +40,7 @@ const initialState = {
   subscribeChannelLoad: false,
   subscribeChannelError: null,
 
-  channelSummary: null,
+  channelSummary: {},
   verifyChannelIDLoad: false,
   verifyChannelError: null,
 
@@ -56,6 +56,14 @@ const initialState = {
   hashcastMessageError: {},
 
   hashcastMessageWaitingList: [],
+
+  currentchannelMessageHashID: null,
+
+  channelMessage: {},
+  channelMessageLoad: {},
+  channelMessageError: {},
+
+  channelMessageWaitingList: [],
 };
 
 function hashCastReducer (state = initialState, action) {
@@ -213,9 +221,8 @@ function hashCastReducer (state = initialState, action) {
     case 'VERIFY_CHANNEL_ID':
       return {
         ...state,
-        channelSummary: null,
-        verifyChannelIDLoad: true,
-        verifyChannelError: null,
+        verifyChannelIDLoad: state.verifyChannelIDLoad === false ? false : true,
+        verifyChannelError: state.verifyChannelError === false ? false : null,
       }
     case 'VERIFY_CHANNEL_ID_SUCCESS':
       return {
@@ -227,7 +234,6 @@ function hashCastReducer (state = initialState, action) {
     case 'VERIFY_CHANNEL_ID_FAILURE':
       return {
         ...state,
-        channelSummary: null,
         verifyChannelIDLoad: false,
         verifyChannelError: action.payload,
       }
@@ -304,6 +310,52 @@ function hashCastReducer (state = initialState, action) {
       return {
         ...state,
         hashcastMessageWaitingList: action.payload,
+      }
+      case 'LOAD_CHANNEL_MESSAGE': 
+      return {
+        ...state,
+        currentchannelMessageHashID: action.payload.hashID,
+        channelMessageLoad: {
+          ...state.channelMessageLoad,
+          [action.payload.hashID]: true,
+        },
+        channelMessageError: {
+          ...state.channelMessageError,
+          [action.payload.hashID]: null,
+        },
+      }
+    case 'LOAD_CHANNEL_MESSAGE_SUCCESS': 
+      return {
+        ...state,
+        channelMessage: {
+          ...state.channelMessage,
+          [action.payload.hashID]: action.payload.channelMessage,
+        },
+        channelMessageLoad: {
+          ...state.channelMessageLoad,
+          [action.payload.hashID]: false,
+        },
+        channelMessageError: {
+          ...state.channelMessageError,
+          [action.payload.hashID]: false,
+        },
+      }
+    case 'LOAD_CHANNEL_MESSAGE_FAILURE': 
+      return {
+        ...state,
+        channelMessageLoad: {
+          ...state.channelMessageLoad,
+          [action.payload.hashID]: false,
+        },
+        channelMessageError: {
+          ...state.channelMessageError,
+          [action.payload.hashID]: action.payload.error,
+        },
+      }
+    case 'UPDATE_CHANNEL_MESSAGE_WAITING_LIST':
+      return {
+        ...state,
+        channelMessageWaitingList: action.payload,
       }
     default:
       return state;

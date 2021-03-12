@@ -22,9 +22,11 @@ import { orderBy, isEqual } from 'lodash';
 
 import { 
   sendHashcastMessage, 
+  sendHashcastFile,
   verifyHashID, 
   findHashcaseWaitingList, 
-  getHashcastMessage 
+  getHashcastMessage,
+  subscribeChannel,
 } from 'actions/hashcastAction';
 import { checkVersion } from 'actions/versionAction';
 import Button from 'components/button/Button';
@@ -33,6 +35,7 @@ import { parseVarna, findHashcasts, hashSlice } from 'util/transactionSort';
 import HashcastHistoryBox from "components/history/HashcastHistoryBox";
 
 import * as styles from './Hashcast.module.scss';
+import { openError } from 'actions/uiAction';
 
 const PER_PAGE = 4;
 
@@ -54,6 +57,9 @@ class Hashcast extends React.Component {
       currentHashcasetMessageHashID,
       hashcastMessage,
       hashcastMessageLoad,
+      subscribedChannelURL,
+      subscribeChannelLoad,
+      subscribeChannelError,
     } = this.props.hashcast;
 
     const { 
@@ -64,11 +70,14 @@ class Hashcast extends React.Component {
       // Simple message that users want to cast
       simpleMessage: '',
 
+      // selected file
+      selectedFile: null,
+
       // channel that message is posted to
       channel: '',
       
       // channel that users want to subscribe
-      subscribedChannel: null,
+      subscribedChannel: '',
 
       // send hashcast status
       sendHashcastLoad,
@@ -111,6 +120,11 @@ class Hashcast extends React.Component {
       currentHashcasetMessageHashID,
       hashcastMessage,
       hashcastMessageLoad,
+
+      // subscribe channel
+      subscribedChannelURL,
+      subscribeChannelLoad,
+      subscribeChannelError,
     }
   }
 
@@ -139,7 +153,7 @@ class Hashcast extends React.Component {
     }
 
     this.props.dispatch(checkVersion());
-    
+
     this.setState({ transactions: sortedData.orderedTransactions });
   }
 
@@ -157,6 +171,9 @@ class Hashcast extends React.Component {
       currentHashcasetMessageHashID,
       hashcastMessage,
       hashcastMessageLoad,
+      subscribedChannelURL,
+      subscribeChannelLoad,
+      subscribeChannelError,
     } = this.props.hashcast;
 
     //your Plasma transactions
@@ -209,7 +226,7 @@ class Hashcast extends React.Component {
 
       // start to get hashcast message
       if ((currentHashcasetMessageHashID === null && hashcastMessageWaitingListTemp.length) ||
-      hashcastMessageWaitingListTemp.length === 1) {
+        hashcastMessageWaitingListTemp.length === 1) {
         this.props.dispatch(getHashcastMessage(
           hashcastMessageWaitingListTemp[0].hashID,
           hashcastMessageWaitingListTemp,
@@ -245,6 +262,28 @@ class Hashcast extends React.Component {
         ));
       }
     }
+
+    if (prevState.hashcast.subscribedChannelURL !== subscribedChannelURL) {
+      this.setState({ subscribedChannelURL });
+    }
+
+    if (prevState.hashcast.subscribeChannelLoad !== subscribeChannelLoad) {
+      this.setState({ subscribeChannelLoad });
+    }
+
+    if (prevState.hashcast.subscribeChannelError !== subscribeChannelError) {
+      this.setState({ subscribeChannelError });
+
+      if (subscribeChannelError === false) {
+        const pageURL = window.location.href;
+        window.open(`${pageURL}${subscribedChannelURL.subscribed}`);
+      }
+
+      if (subscribeChannelError === 404) {
+        this.props.dispatch(openError("Channel not found"));
+        this.setState({ subscribedChannel: '' });
+      }
+    }
   }
 
   handleSimpleMessage(event) {
@@ -263,12 +302,21 @@ class Hashcast extends React.Component {
     this.setState({ hashToPull: event.target.value });
   }
 
+  handleFileChange(event) {
+    this.setState({ selectedFile: event.target.files[0] });
+  }
+
   /*********************************************/
   /******** Hashcast a simple string ***********/
   /*********************************************/
   handleHashcast() {
-    const { simpleMessage, channel } = this.state;
-    this.props.dispatch(sendHashcastMessage(simpleMessage, channel));
+    const { simpleMessage, selectedFile, channel } = this.state;
+    if (simpleMessage) {
+      this.props.dispatch(sendHashcastMessage(simpleMessage, channel));
+    }
+    if (selectedFile) {
+      this.props.dispatch(sendHashcastFile(selectedFile, channel));
+    }
   }
 
   /************************************************/
@@ -294,10 +342,19 @@ class Hashcast extends React.Component {
     this.setState({ hashcasts, filterTag: '' });
   }
 
+
+  /*********************************************/
+  /********** Subscribe a channel **************/
+  /*********************************************/
+  handleSubscribe() {
+    const { subscribedChannel } = this.state;
+    this.props.dispatch(subscribeChannel(subscribedChannel));
+  }
+
   render() {
 
     const { 
-      simpleMessage, channel,
+      simpleMessage, selectedFile, channel, subscribedChannel,
       // upload hashcast status
       uploadHashcastMessageLoad, uploadHashcastFileLoad,
       // get url
@@ -314,6 +371,8 @@ class Hashcast extends React.Component {
       filterTag,
       // hashcast message
       hashcastMessage,
+      // subscribe channel
+      subscribeChannelLoad,
     } = this.state;
 
     let uploadButtonText = "Cast";
@@ -330,6 +389,9 @@ class Hashcast extends React.Component {
       uploadButtonText = 'Configuring';
       uploadButtonLoading = true;
     }
+
+    let subscribeButtonText = "Subscribe";
+    if (subscribeChannelLoad) subscribeButtonText = "Subscribing";
 
     //const _transactions = hashcasts; //transactions; //.filter(i => itemOpenList.includes(i.metadata));
     const paginatedHashcasts = hashSlice(page, PER_PAGE, hashcasts);
@@ -352,6 +414,17 @@ class Hashcast extends React.Component {
               className={styles.input}
               placeholder="Hello world!"
               onChange={event => {this.handleSimpleMessage(event)}}
+              disabled={selectedFile}
+            />
+            <div className={styles.basictext}>
+              Select your image
+            </div>
+            <input 
+              type="file" 
+              className={styles.input}
+              accept="image/*"
+              onChange={(event)=>{this.handleFileChange(event)}} 
+              disabled={simpleMessage}
             />
             <div className={styles.basictext}>
               Add channel tag
@@ -362,17 +435,37 @@ class Hashcast extends React.Component {
               placeholder="Optional"
               onChange={event => {this.handleChannel(event)}}
             />
-
-          <Button
-            type='primary'
-            className={styles.button}
-            style={{marginTop: 20}}
-            loading={uploadButtonLoading}
-            disabled={!simpleMessage || uploadButtonLoading}
-            onClick={()=>{this.handleHashcast()}}
-          >
-            {uploadButtonText}
-          </Button>
+            <Button
+              type='primary'
+              className={styles.button}
+              style={{marginTop: 20}}
+              loading={uploadButtonLoading}
+              disabled={(!simpleMessage && !selectedFile) || uploadButtonLoading}
+              onClick={()=>{this.handleHashcast()}}
+            >
+              {uploadButtonText}
+            </Button>
+          </div>
+          <div className={styles.innerContainer}>
+            <div className={styles.basictext}>
+              Enter channel tag
+            </div>
+            <input
+              value={subscribedChannel}
+              className={styles.input}
+              placeholder="Subscribe to OMG"
+              onChange={event => {this.handleSubscribeChannel(event)}}
+            />
+            <Button
+              type='primary'
+              className={styles.button}
+              style={{marginTop: 20}}
+              loading={subscribeChannelLoad}
+              disabled={!subscribedChannel || subscribeChannelLoad}
+              onClick={()=>{this.handleSubscribe()}}
+            >
+              {subscribeButtonText}
+            </Button>
           </div>
         </div>
 
@@ -425,6 +518,7 @@ class Hashcast extends React.Component {
 
           </div>
         </div>
+
       </div>
     )
   }
