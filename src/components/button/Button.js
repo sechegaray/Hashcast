@@ -29,6 +29,7 @@ function Button ({
   size,
   className,
   triggerTime,
+  inactive,
 }) {
 
   if(disabled || loading)
@@ -64,6 +65,7 @@ function Button ({
         loading ? styles.disabled : '',
         disabled ? styles.disabled : '',
         pulsate ? styles.pulsate : '',
+        inactive ? styles.inactive : '',
         className
       ].join(' ')}
       onClick={loading || disabled ? null : onClick}

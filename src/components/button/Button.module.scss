@@ -11,6 +11,8 @@
   transition: all 200ms ease-in-out;
   min-width: 150px;
   max-width: $maxWidth;
+  border: 1px solid;
+  border-color: rgba(0, 0, 0, 0);
   @include mobile {
     min-width: 100px;
   }
@@ -27,7 +29,7 @@
 }
 
 .primary {
-  background-color: $blue;
+  background-color: $blue1;
 }
 
 .secondary {
@@ -39,20 +41,26 @@
 }
 
 .pulsate {
-  background: blue;
+  background: blue1;
   animation: pulse-animation 2s infinite;
+}
+
+.inactive {
+  background-color: white !important;
+  color: $blue2 !important;
+  border: 1px solid $blue2;
 }
 
 @keyframes pulse-animation {
   0% {
-    box-shadow: 0 0 0 0px blue;
+    box-shadow: 0 0 0 0px blue1;
   }
   100% {
     box-shadow: 0 0 0 20px rgba(0, 0, 0, 0);
   }
 }
 
-/*disabled dark blue*/
+/*disabled dark blue1*/
 .disabled {
   filter: brightness(50%);
   cursor: initial;

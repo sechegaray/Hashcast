@@ -134,16 +134,16 @@ const hashpullGetUrlFailure = (hashID, error) => ({
   payload: { hashID, error },
 })
 
-const verifyHashIDObjBegin = () => ({
+const verifyHashIDBegin = () => ({
   type : 'VERIFY_HASH_ID',
 })
 
-const verifyHashIDObjSuccess = (data) => ({
+const verifyHashIDSuccess = (data) => ({
   type : 'VERIFY_HASH_ID_SUCCESS',
   payload: data,
 })
 
-const verifyHashIDObjFailure = (data) => ({
+const verifyHashIDFailure = (data) => ({
   type : 'VERIFY_HASH_ID_FAILURE',
   payload: data,
 })
@@ -223,7 +223,11 @@ export const uploadHashcastMessage = (message, channel, hashID) => (dispatch) =>
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ message, channel, hashID }),
+    body: JSON.stringify({ 
+      message, 
+      channel: channel ? channel : null, 
+      hashID,
+    }),
   }).then(res => {
     if (res.status === 201) {
       return res.json()
@@ -405,8 +409,8 @@ export const verifyChannelID = (channelID) => (dispatch) => {
   })
 }
 
-export const verifyHashIDObj = (hashIDArray) => (dispatch) => {
-  dispatch(verifyHashIDObjBegin());
+export const verifyHashID = (hashIDArray) => (dispatch) => {
+  dispatch(verifyHashIDBegin());
 
   fetch(HASHCAST_API_URL + 'validateid', {
     method: "POST",
@@ -419,15 +423,15 @@ export const verifyHashIDObj = (hashIDArray) => (dispatch) => {
     if (res.status === 201) {
       return res.json()
     } else {
-      dispatch(verifyHashIDObjFailure(res.status));
+      dispatch(verifyHashIDFailure(res.status));
       return ""
     }
   }).then(data => {
     if (data !== "") {
       if (data.status === "success") {
-        dispatch(verifyHashIDObjSuccess(data.hashIDStatusObj));
+        dispatch(verifyHashIDSuccess(data.hashIDStatusObj));
       } else {
-        dispatch(verifyHashIDObjFailure(404));
+        dispatch(verifyHashIDFailure(404));
       }
     }
   })

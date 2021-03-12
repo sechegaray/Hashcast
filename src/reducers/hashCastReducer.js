@@ -44,10 +44,10 @@ const initialState = {
   verifyChannelIDLoad: false,
   verifyChannelError: null,
 
-  verifiedhashIDObj: {},
-  verifyHashIDObjLoad: false,
-  verifyHashIDObjError: null,
-  verifyHashIDObjLoadIndicator: null,
+  verifiedHashID: [],
+  verifyHashIDLoad: false,
+  verifyHashIDError: null,
+  verifyHashIDLoadIndicator: null,
 };
 
 function hashCastReducer (state = initialState, action) {
@@ -225,31 +225,31 @@ function hashCastReducer (state = initialState, action) {
       }
     case 'VERIFY_HASH_ID':
 
-      let verifyHashIDObjLoadIndicator = state.verifyHashIDObjLoadIndicator;
-      if (state.verifyHashIDObjLoadIndicator === null) {
-        verifyHashIDObjLoadIndicator = true;
+      let verifyHashIDLoadIndicator = state.verifyHashIDLoadIndicator;
+      if (state.verifyHashIDLoadIndicator === null) {
+        verifyHashIDLoadIndicator = true;
       }
 
       return {
         ...state,
-        verifyHashIDObjLoad: true,
-        verifyHashIDObjError: null,
-        verifyHashIDObjLoadIndicator,
+        verifyHashIDLoad: true,
+        verifyHashIDError: null,
+        verifyHashIDLoadIndicator,
       }
     case 'VERIFY_HASH_ID_SUCCESS': 
       return  {
         ...state,
-        verifiedhashIDObj: action.payload,
-        verifyHashIDObjLoad: false,
-        verifyHashIDObjError: false,
-        verifyHashIDObjLoadIndicator: false,
+        verifiedHashID: action.payload,
+        verifyHashIDLoad: false,
+        verifyHashIDError: false,
+        verifyHashIDLoadIndicator: false,
       }
     case 'VERIFY_HASH_ID_FAILURE': 
       return  {
         ...state,
-        verifyHashIDObjLoad: false,
-        verifyHashIDObjError: action.payload,
-        verifyHashIDObjLoadIndicator: false,
+        verifyHashIDLoad: false,
+        verifyHashIDError: action.payload,
+        verifyHashIDLoadIndicator: false,
       }
     default:
       return state;

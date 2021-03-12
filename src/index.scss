@@ -1,8 +1,13 @@
 $red: #ff6868;
 $yellow: #f0ba31;
 $green: #0ebf9a;
-$blue: #4967ff;
 $maxWidth: 450px;
+
+$blue1: #4967ff;
+$blue2: #0062cc;
+$blue3: #3952a4;
+$blue4: #80bdff;
+$blue5: #007bff40;
 
 $gray1: #101010; //v. dark gray
 $gray2: #323232;
@@ -18,7 +23,11 @@ $bunnyRed: #C83950;
   red: $red;
   yellow: $yellow;
   green: $green;
-  blue: $blue;
+  blue1: $blue1;
+  blue2: $blue2;
+  blue3: $blue3;
+  blue4: $blue4;
+  blue5: $blue5;
   gray1: $gray1;
   gray2: $gray2;
   gray3: $gray3;
@@ -103,7 +112,7 @@ input {
 }
 
 input::focus {
-  border: 1px solid $blue;
+  border: 1px solid $blue1;
 }
 
 input::-webkit-outer-spin-button,
@@ -118,7 +127,7 @@ h1 {
   font-family: 'Messina';
   font-weight: 400;
   font-size: 2em;
-  color: $blue;
+  color: $blue1;
 }
 
 h2 {
