@@ -21,7 +21,7 @@
 .rightBoxContainer {
   display: inline-block;
   padding: 5px;
-  width: 60%;
+  width: 65%;
   min-width: 300px;
 }
 
@@ -72,12 +72,15 @@
   box-shadow: 0 0 0 0.2rem $blue5;
 }
 
+.input::placeholder {
+  font-size: 13px;
+}
+
 .button {
   border-radius: 10px;
   background-color: $blue2;
   color: white;
 }
-
 
 .smallButton {
   border-radius: 10px;
@@ -91,7 +94,7 @@
   width: 50%;
 }
 
-@media screen and (max-width: 820px) {
+@media screen and (max-width: 950px) {
   .leftBoxContainer {
     width: 100%;
   }

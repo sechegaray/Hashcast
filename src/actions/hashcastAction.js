@@ -148,6 +148,26 @@ const verifyHashIDFailure = (data) => ({
   payload: data,
 })
 
+export const updateHashcastMessageWaitingList = (data) => ({
+  type: 'UPDATE_HASHCAST_MESSAGE_WAITING_LIST',
+  payload: data,
+})
+
+const getHashcastMessageBegin = (hashID) => ({
+  type: 'LOAD_HASHCAST_MESSAGE',
+  payload: { hashID },
+})
+
+const getHashcastMessageSuccess = (hashID, hashcastMessage) => ({
+  type: 'LOAD_HASHCAST_MESSAGE_SUCCESS',
+  payload: { hashID, hashcastMessage },
+})
+
+const getHashcastMessageFailure = (hashID, error) => ({
+  type: 'LOAD_HASHCAST_MESSAGE_FAILURE',
+  payload: { hashID, error },
+})
+
 const configureHashcastToPlasma = (hashID) => async (dispatch) => {
 
   let recipient = networkService.account;
@@ -437,7 +457,7 @@ export const verifyHashID = (hashIDArray) => (dispatch) => {
   })
 }
 
-export const hashPull = (hash) => (dispatch) => {
+export const hashPull = (hash) => {
   return fetch(HASHCAST_API_URL + 'pull', {
     method: "POST",
     headers: {
@@ -454,4 +474,46 @@ export const hashPull = (hash) => (dispatch) => {
   }).then(data => {
     return data;
   })
+}
+
+export const findHashcaseWaitingList = (
+  verifiedHashID, 
+  hashcastMessageLoad, 
+  hashcastMessageWaitingList
+) => (dispatch) => {
+  const hashcastMessageWaitingListTemp = [...hashcastMessageWaitingList];
+  
+  for (let eachHashIDObj of verifiedHashID) {
+    const eachHashID = eachHashIDObj.hashID;
+
+    const filteredHashcastMessageWaitingList = hashcastMessageWaitingList.filter(
+      element => element.hahsID === eachHashID
+    )
+    
+    if (typeof hashcastMessageLoad[eachHashID] === 'undefined' && 
+      filteredHashcastMessageWaitingList.length === 0) {
+        hashcastMessageWaitingListTemp.push({ hashID: eachHashID });
+    }
+  }
+  console.log({ findHashcaseWaitingList: hashcastMessageWaitingListTemp })
+  dispatch(updateHashcastMessageWaitingList(hashcastMessageWaitingListTemp));
+  return hashcastMessageWaitingListTemp
+}
+
+export const getHashcastMessage = (hashID, hashcastMessageWaitingList) => async (dispatch) => {
+  dispatch(getHashcastMessageBegin(hashID));
+  const hashcastMessage = await hashPull(hashID);
+
+  const hashcastMessageWaitingListTemp = hashcastMessageWaitingList.filter(i => i.hashID !== hashID);
+  dispatch(updateHashcastMessageWaitingList(hashcastMessageWaitingListTemp));
+
+  if (hashcastMessage !== "") {
+    if (hashcastMessage.status === 'success') {
+      dispatch(getHashcastMessageSuccess(hashID, hashcastMessage.ciphertext));
+    } else {
+      dispatch(getHashcastMessageFailure(hashID, 404));
+    }
+  } else {
+    dispatch(getHashcastMessageFailure(hashID, 404));
+  }
 }

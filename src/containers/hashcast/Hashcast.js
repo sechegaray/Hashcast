@@ -20,7 +20,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { orderBy, isEqual } from 'lodash';
 
-import { sendHashcastMessage, verifyHashID } from 'actions/hashcastAction';
+import { 
+  sendHashcastMessage, 
+  verifyHashID, 
+  findHashcaseWaitingList, 
+  getHashcastMessage 
+} from 'actions/hashcastAction';
 import Button from 'components/button/Button';
 import Pager from 'components/pager/Pager';
 import { parseVarna, findHashcasts, hashSlice } from 'util/transactionSort';
@@ -44,6 +49,10 @@ class Hashcast extends React.Component {
       configureHashcastToPlasmaLoad,
       hashpullGetUrlLoad,
       verifiedHashID,
+      hashcastMessageWaitingList,
+      currentHashcasetMessageHashID,
+      hashcastMessage,
+      hashcastMessageLoad,
     } = this.props.hashcast;
 
     const { 
@@ -93,15 +102,40 @@ class Hashcast extends React.Component {
 
       // filter
       filterTag: '',
+
+      // the waiting list of hashcast that needs to be downloaded
+      hashcastMessageWaitingList,
+
+      // downloaded hashcast message
+      currentHashcasetMessageHashID,
+      hashcastMessage,
+      hashcastMessageLoad,
     }
   }
 
   componentDidMount() {
     const { transaction } = this.props;
-    
+    const { hashcastMessageWaitingList, verifiedHashID } = this.state;
+
     const sortedData = parseVarna(transaction);
 
-    this.props.dispatch(verifyHashID(sortedData.hashcastMeta));
+    if (sortedData.hashcastMeta.length) {
+      this.props.dispatch(verifyHashID(sortedData.hashcastMeta));
+    }
+
+    // Display the hashcast data
+    if (verifiedHashID.length) {
+      const hashcasts = findHashcasts(transaction, verifiedHashID);
+      this.setState({ hashcasts });
+    }
+
+    // restart to download message
+    if (hashcastMessageWaitingList.length) {
+      this.props.dispatch(getHashcastMessage(
+        hashcastMessageWaitingList[0].hashID,
+        hashcastMessageWaitingList,
+      ));
+    }
 
     this.setState({ transactions: sortedData.orderedTransactions });
   }
@@ -116,6 +150,10 @@ class Hashcast extends React.Component {
       configureHashcastToPlasmaLoad,
       hashpullGetUrlLoad,
       verifiedHashID,
+      hashcastMessageWaitingList,
+      currentHashcasetMessageHashID,
+      hashcastMessage,
+      hashcastMessageLoad,
     } = this.props.hashcast;
 
     //your Plasma transactions
@@ -147,7 +185,6 @@ class Hashcast extends React.Component {
       this.setState({ hashpullGetUrlLoad });
     }
 
-
     if (prevState.transaction !== transaction) {
       //this means that you have either submitted a new item or a new bid,
       //so your Plasma transaction list has changed
@@ -159,7 +196,50 @@ class Hashcast extends React.Component {
     if (!isEqual(prevState.hashcast.verifiedHashID, verifiedHashID)) {
       this.setState({ verifiedHashID, filterTag: '' });
       const hashcasts = findHashcasts(transaction, verifiedHashID);
+
+      const hashcastMessageWaitingListTemp = this.props.dispatch(findHashcaseWaitingList(
+        verifiedHashID,
+        hashcastMessageLoad,
+        hashcastMessageWaitingList,
+      ));
+
+      // start to get hashcast message
+      if ((currentHashcasetMessageHashID === null && hashcastMessageWaitingListTemp.length) ||
+      hashcastMessageWaitingListTemp.length === 1) {
+        this.props.dispatch(getHashcastMessage(
+          hashcastMessageWaitingListTemp[0].hashID,
+          hashcastMessageWaitingListTemp,
+        ));
+      }
+
       this.setState({ hashcasts });
+    }
+
+    if (!isEqual(hashcastMessageWaitingList, hashcastMessageWaitingList)) {
+      this.setState({ hashcastMessageWaitingList });
+    }
+
+    if (prevState.hashcast.currentHashcasetMessageHashID !== currentHashcasetMessageHashID) {
+      this.setState({ currentHashcasetMessageHashID });
+    }
+
+    if (!isEqual(prevState.hashcast.hashcastMessage, hashcastMessage)) {
+      this.setState({ hashcastMessage });
+    }
+
+    if (!isEqual(prevState.hashcast.hashcastMessageLoad, hashcastMessageLoad)) {
+      this.setState({ hashcastMessageLoad });
+
+      if (prevState.hashcast.hashcastMessageLoad[currentHashcasetMessageHashID] !== 
+        hashcastMessageLoad[currentHashcasetMessageHashID] &&
+        hashcastMessageLoad[currentHashcasetMessageHashID] === false &&
+        hashcastMessageWaitingList.length
+      ) {
+        this.props.dispatch(getHashcastMessage(
+          hashcastMessageWaitingList[0].hashID,
+          hashcastMessageWaitingList,
+        ));
+      }
     }
   }
 
@@ -228,6 +308,8 @@ class Hashcast extends React.Component {
       hashpullGetUrlLoad,
       // filter tag
       filterTag,
+      // hashcast message
+      hashcastMessage,
     } = this.state;
 
     let uploadButtonText = "Cast";
@@ -259,7 +341,7 @@ class Hashcast extends React.Component {
         <div className={styles.leftBoxContainer}>
           <div className={styles.innerContainer}>
             <div className={styles.basictext}>
-              Enter your hash cast
+              Enter your hashcast
             </div>
             <input
               value={simpleMessage}
@@ -307,7 +389,7 @@ class Hashcast extends React.Component {
                 value={filterTag}
                 className={`${styles.input} ${styles.smallInput}`}
                 style={{margin: 0}}
-                placeholder="Show only hash casts tagged with..."
+                placeholder="Show only hashcasts tagged with..."
                 onChange={event => {this.handleFilterTag(event)}}
               />
             </div>
@@ -330,7 +412,7 @@ class Hashcast extends React.Component {
                 return (
                   <HashcastHistoryBox 
                     key={i} 
-                    data={{...v, hashpullGetUrlLoad}}
+                    data={{...v, hashpullGetUrlLoad, hashcastMessage}}
                   />
                 )
               })}
