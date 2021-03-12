@@ -259,7 +259,7 @@ class Hashcast extends React.Component {
         <div className={styles.leftBoxContainer}>
           <div className={styles.innerContainer}>
             <div className={styles.basictext}>
-              Enter your hash cast
+              Enter your hashcast
             </div>
             <input
               value={simpleMessage}
@@ -307,7 +307,7 @@ class Hashcast extends React.Component {
                 value={filterTag}
                 className={`${styles.input} ${styles.smallInput}`}
                 style={{margin: 0}}
-                placeholder="Show only hash casts tagged with..."
+                placeholder="Show only hashcasts tagged with..."
                 onChange={event => {this.handleFilterTag(event)}}
               />
             </div>
