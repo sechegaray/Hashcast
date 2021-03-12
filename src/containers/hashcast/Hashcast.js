@@ -304,10 +304,10 @@ class Hashcast extends React.Component {
 
   handleFileChange(event) {
     const fileSize = event.target.files[0].size;
-    if (fileSize < 1024 * 64) {
+    if (fileSize < 1024 * 1024) {
       this.setState({ selectedFile: event.target.files[0] });
     } else {
-      this.props.dispatch(openError('File size exceeds 64kb'));
+      this.props.dispatch(openError('File size exceeds 1MB'));
       event.target.value = null;
     }
   }
