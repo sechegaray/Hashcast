@@ -38,6 +38,10 @@ REACT_APP_POLL_INTERVAL=20 //number of seconds to poll account data
 
 5. Open your browser and navigate to `http://localhost:3000`. A refreshed `web-wallet` and a simple `Hashcast` UI will be available. 
 
+## Problems?
+
+* If your Watcher status says `syncing` for more than a second or so, and performance is terrible, then you have not correctly set up your .env file. See point 3 above.
+
 ## Patching
 
 To patch npm-delivered files, simply, for example:
