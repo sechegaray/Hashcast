@@ -111,3 +111,6 @@ yarn.lock
 
 # generated runtime envs
 public/env.js
+
+# Build folder
+build

@@ -495,7 +495,7 @@ export const findHashcaseWaitingList = (
         hashcastMessageWaitingListTemp.push({ hashID: eachHashID });
     }
   }
-  console.log({ findHashcaseWaitingList: hashcastMessageWaitingListTemp })
+
   dispatch(updateHashcastMessageWaitingList(hashcastMessageWaitingListTemp));
   return hashcastMessageWaitingListTemp
 }
