@@ -1,17 +1,24 @@
 @import 'index.scss';
 
 .container { 
-  background-color: $bunnyRed;
+  background-color: $blue2;
   padding: 7px;
   box-sizing: border-box;
   transition: all 200ms ease-in-out;
   margin-bottom: 5px;
   position: relative;
+  padding: 10px;
+  border-radius: 10px;
   .pulsate {
-    background: blue;
+    background: blue1;
     animation: pulseAnimation 2s infinite;
   }
 
+}
+
+.button {
+  background-color: $blue3;
+  border-radius: 5px;
 }
 
 .line {
@@ -21,7 +28,7 @@
 }
 
 .lineHC {
-  color: $gray6;
+  color: white;
   font-size: 0.8em;
   padding-Top: 3px;
 }
@@ -69,7 +76,7 @@
   }
   100% {
     box-shadow: 0 0 0 20px rgba(0, 0, 0, 0);
-    background: blue
+    background: blue1
   }
 }
 

@@ -16,55 +16,41 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { orderBy } from 'lodash';
+import { orderBy, uniq } from 'lodash';
 
-export const findHashcasts = (transaction) => {
+export const findHashcasts = (transaction, activeHashID) => {
 
   const orderedTransactions = orderBy(transaction, i => i.block.timestamp, 'desc');
-
   const hashcasts = [];
 
-  orderedTransactions.forEach(element => {
-
-    //todo - write this elegantly with filters rather than silly if()s
-    if(typeof element.metadata === 'undefined') return;
+  activeHashID.forEach(element => {
+    const hashID = element.hashID;
+    const filterTransactions = orderedTransactions.filter(i => i.metadata === hashID);
     
-    if(element.metadata === '') return;
-    if(element.metadata === 'Merge UTXOs') return;
-    if(element.metadata === 'atomic swap') return;
-    if(element.metadata.includes('--')) return;
-    if(element.metadata.includes('-SWAP-')) return;
-    if(element.metadata.includes('<->')) return;
-
-    //a plain transfer has the sender wallet as as element.inputs[0].owner, and the 
-    //recipient wallet address is element.outputs[1].owner
-    if(typeof element.inputs !== 'undefined' && typeof element.outputs !== 'undefined') {
-      if(element.inputs.length > 0 && element.outputs.length > 1) {
-        const sender = element.inputs[element.inputs.length-1].owner;
-        const recipient = element.outputs[element.outputs.length-1].owner;
-        if ( sender !== recipient ) //it's a 'real' transfer among two distinct wallets
-          //so we don't care about it
-          return;
+    if (filterTransactions.length) {
+      let hcID = 'pending';
+      let time = Date.now();
+      let blockNum = null;
+  
+      if(typeof filterTransactions[0].block !== 'undefined') {
+        if (typeof filterTransactions[0].block.hash !== 'undefined')
+          hcID = filterTransactions[0].block.hash;
+        if (typeof filterTransactions[0].block.timestamp !== 'undefined')
+          time = filterTransactions[0].block.timestamp;
+        if (typeof filterTransactions[0].block.blknum !== 'undefined')
+          blockNum = filterTransactions[0].block.blknum;
       }
+  
+      hashcasts.push({
+        msg: hashID,
+        hcID,
+        time,
+        blockNum,
+        tag: element.tag,
+      });
     }
 
-    let hcID = 'pending';
-    let time = Date.now();
-
-    if(typeof element.block !== 'undefined') {
-      if (typeof element.block.hash !== 'undefined')
-        hcID = element.block.hash;
-      if (typeof element.block.timestamp !== 'undefined')
-        time = element.block.timestamp;
-    }
-
-    hashcasts.push({
-      msg: element.metadata,
-      hcID,
-      time,
-    });
-
-  });
+  })
 
   return hashcasts;
 }
@@ -98,6 +84,7 @@ export const parseVarna = (transaction) => {
 
   const IDList = [];
   const swapMetaRaw = [];
+  const hashcastMeta = [];
   let isBeginner = true;
 
   orderedTransactions.forEach(element => {
@@ -108,12 +95,22 @@ export const parseVarna = (transaction) => {
     if (element.metadata.length === 32 && element.metadata.includes('-SWAP-')) {
       swapMetaRaw.push(element.metadata);
     }
+    if (typeof element.metadata !== 'undefined' &&
+      element.metadata !== '' &&
+      element.metadata !== 'Merge UTXOs' &&
+      element.metadata !== 'atomic swap' &&
+      !element.metadata.includes('--') &&
+      !element.metadata.includes('-SWAP-') &&
+      !element.metadata.includes('<->')) {
+      hashcastMeta.push(element.metadata);
+    }
   });
 
   return { 
     IDList, 
     orderedTransactions,
     swapMetaRaw,
+    hashcastMeta: uniq(hashcastMeta),
     isBeginner,
   };
 }

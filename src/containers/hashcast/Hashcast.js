@@ -20,7 +20,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { orderBy, isEqual } from 'lodash';
 
-import { sendHashcastMessage, sendHashcastFile, subscribeChannel } from 'actions/hashcastAction';
+import { sendHashcastMessage, verifyHashID } from 'actions/hashcastAction';
 import Button from 'components/button/Button';
 import Pager from 'components/pager/Pager';
 import { parseVarna, findHashcasts, hashSlice } from 'util/transactionSort';
@@ -42,10 +42,8 @@ class Hashcast extends React.Component {
       getUploadHashCastFileURLLoad,
       uploadHashcastFileLoad,
       configureHashcastToPlasmaLoad,
-      subscribedChannelURL,
-      subscribeChannelLoad,
-      subscribeChannelError,
       hashpullGetUrlLoad,
+      verifiedHashID,
     } = this.props.hashcast;
 
     const { 
@@ -55,12 +53,9 @@ class Hashcast extends React.Component {
     this.state = {
       // Simple message that users want to cast
       simpleMessage: '',
-      
-      // selected file
-      selectedFile: null,
 
       // channel that message is posted to
-      channel: null,
+      channel: '',
       
       // channel that users want to subscribe
       subscribedChannel: null,
@@ -80,11 +75,6 @@ class Hashcast extends React.Component {
       // configure plasma
       configureHashcastToPlasmaLoad,
 
-      // subscribe channel
-      subscribedChannelURL,
-      subscribeChannelLoad,
-      subscribeChannelError,
-
       // download hashcast
       hashpullGetUrlLoad,
 
@@ -98,6 +88,11 @@ class Hashcast extends React.Component {
       //history of Hashcasts
       page: 1,
 
+      // active hashID
+      verifiedHashID,
+
+      // filter
+      filterTag: '',
     }
   }
 
@@ -105,10 +100,10 @@ class Hashcast extends React.Component {
     const { transaction } = this.props;
     
     const sortedData = parseVarna(transaction);
-    const hashcasts = findHashcasts(transaction);
+
+    this.props.dispatch(verifyHashID(sortedData.hashcastMeta));
 
     this.setState({ transactions: sortedData.orderedTransactions });
-    this.setState({ hashcasts });
   }
 
   componentDidUpdate(prevState) {
@@ -119,10 +114,8 @@ class Hashcast extends React.Component {
       getUploadHashCastFileURLLoad,
       uploadHashcastFileLoad,
       configureHashcastToPlasmaLoad,
-      subscribedChannelURL,
-      subscribeChannelLoad,
-      subscribeChannelError,
       hashpullGetUrlLoad,
+      verifiedHashID,
     } = this.props.hashcast;
 
     //your Plasma transactions
@@ -150,18 +143,6 @@ class Hashcast extends React.Component {
       this.setState({ configureHashcastToPlasmaLoad });
     }
 
-    if (prevState.hashcast.subscribedChannelURL !== subscribedChannelURL) {
-      this.setState({ subscribedChannelURL });
-    }
-
-    if (prevState.hashcast.subscribeChannelLoad !== subscribeChannelLoad) {
-      this.setState({ subscribeChannelLoad });
-    }
-
-    if (prevState.hashcast.subscribeChannelError !== subscribeChannelError) {
-      this.setState({ subscribeChannelError });
-    }
-
     if (!isEqual(prevState.hashcast.hashpullGetUrlLoad, hashpullGetUrlLoad)) {
       this.setState({ hashpullGetUrlLoad });
     }
@@ -171,9 +152,13 @@ class Hashcast extends React.Component {
       //this means that you have either submitted a new item or a new bid,
       //so your Plasma transaction list has changed
       const sortedData = parseVarna(transaction);
-      const hashcasts = findHashcasts(transaction);
-
+      this.props.dispatch(verifyHashID(sortedData.hashcastMeta));
       this.setState({ transactions: sortedData.orderedTransactions });
+    }
+
+    if (!isEqual(prevState.hashcast.verifiedHashID, verifiedHashID)) {
+      this.setState({ verifiedHashID, filterTag: '' });
+      const hashcasts = findHashcasts(transaction, verifiedHashID);
       this.setState({ hashcasts });
     }
   }
@@ -190,10 +175,6 @@ class Hashcast extends React.Component {
     this.setState({ subscribedChannel: event.target.value });
   }
 
-  handleFileChange(event) {
-    this.setState({ selectedFile: event.target.files[0] });
-  }
-
   handleSetHash(event) {
     this.setState({ hashToPull: event.target.value });
   }
@@ -201,49 +182,55 @@ class Hashcast extends React.Component {
   /*********************************************/
   /******** Hashcast a simple string ***********/
   /*********************************************/
-
-  //submit a simple Hashcast
   handleHashcast() {
-    const { simpleMessage, selectedFile, channel } = this.state;
-    if (simpleMessage) {
-      this.props.dispatch(sendHashcastMessage(simpleMessage, channel));
-    }
-    if (selectedFile) {
-      this.props.dispatch(sendHashcastFile(selectedFile, channel));
-    }
+    const { simpleMessage, channel } = this.state;
+    this.props.dispatch(sendHashcastMessage(simpleMessage, channel));
   }
 
-  /*********************************************/
-  /********** Subscribe a channel **************/
-  /*********************************************/
-  handleSubscribe() {
-    const { subscribedChannel } = this.state;
-    this.props.dispatch(subscribeChannel(subscribedChannel));
+  /************************************************/
+  /******** filter the hashcast message ***********/
+  /************************************************/
+  handleFilterTag(event) {
+    const { transactions, verifiedHashID } = this.state;
+    const filterTag = event.target.value;
+    if (!filterTag) {
+      const hashcasts = findHashcasts(transactions, verifiedHashID);
+      this.setState({ hashcasts });
+    } else {
+      const hashcasts = findHashcasts(transactions, verifiedHashID);
+      const filteredHashcasts = hashcasts.filter(i => i.tag && i.tag.includes(filterTag));
+      this.setState({ hashcasts: filteredHashcasts });
+    }
+    this.setState({ filterTag });
+  }
+
+  hanldeShowAll() {
+    const { transactions, verifiedHashID } = this.state;
+    const hashcasts = findHashcasts(transactions, verifiedHashID);
+    this.setState({ hashcasts, filterTag: '' });
   }
 
   render() {
 
     const { 
-      simpleMessage, selectedFile, channel, subscribedChannel,
+      simpleMessage, channel,
       // upload hashcast status
       uploadHashcastMessageLoad, uploadHashcastFileLoad,
       // get url
       getUploadHashCastFileURLLoad,
       // configure plasma
       configureHashcastToPlasmaLoad,
-      // subscribe channel
-      subscribedChannelURL, subscribeChannelLoad, subscribeChannelError,
       // page
       page,
       // hashcast data
       hashcasts,
       // pull data
       hashpullGetUrlLoad,
+      // filter tag
+      filterTag,
     } = this.state;
 
-    const pageURL = window.location.href;
-
-    let uploadButtonText = "Let's CAST!";
+    let uploadButtonText = "Cast";
     let uploadButtonLoading = false;
     if (getUploadHashCastFileURLLoad) {
       uploadButtonText = 'Getting URL';
@@ -258,9 +245,6 @@ class Hashcast extends React.Component {
       uploadButtonLoading = true;
     }
 
-    let subscribeButtonText = "Subscribe";
-    if (subscribeChannelLoad) subscribeButtonText = "Subscribing";
-
     //const _transactions = hashcasts; //transactions; //.filter(i => itemOpenList.includes(i.metadata));
     const paginatedHashcasts = hashSlice(page, PER_PAGE, hashcasts);
 
@@ -271,66 +255,34 @@ class Hashcast extends React.Component {
     if (totalNumberOfPages === 0) totalNumberOfPages = 1;
 
     return (
+      <div className={styles.container}>
+        <div className={styles.leftBoxContainer}>
+          <div className={styles.innerContainer}>
+            <div className={styles.basictext}>
+              Enter your hash cast
+            </div>
+            <input
+              value={simpleMessage}
+              className={styles.input}
+              placeholder="Hello world!"
+              onChange={event => {this.handleSimpleMessage(event)}}
+            />
+            <div className={styles.basictext}>
+              Add channel tag
+            </div>
+            <input
+              value={channel}
+              className={styles.input}
+              placeholder="Optional"
+              onChange={event => {this.handleChannel(event)}}
+            />
 
-      <div className={styles.Container}>
-
-        <div className={styles.InputContainer}>
-
-          <div className={styles.Note}>
-            <span className={styles.B}>Hashcast</span> is like Twitter for computers. You can 
-            {' '}<span className={styles.B}>CAST</span> (broadcast) many different types 
-            of messages, ranging from simple strings ('Hello world!') to 
-            cryptographic payloads, such as Varna bids and atomic swap signatures.
-            You can scan Plasma for these broadcasts, and if you find something 
-            interesting, most hashes resolve to files that you can 
-            {' '}<span className={styles.B}>PULL</span>{' '}(download).
-            <br/>
-            <br/>
-            Hashcast allows all of us on Plasma to connect, trade, store stuff, 
-            communicate, and exchange data. The latter capability is the starting 
-            point for inter-process communication and synchronization, which is 
-            needed for things like atomic swaps.
-          </div>
-
-          <div style={{background: '#C83950', padding: '5px', marginTop: '5px'}}>
-          
-          <h3 style={{marginTop: '5px', marginBottom: 0, color: 'white'}}>What would you like to CAST?</h3>
-
-          <h5 style={{marginBottom: 0, color: 'white'}}>A simple message...</h5>
-          
-          <div className={styles.NoteWhite}>
-            This message will be stored as cleartext at the location defined by the message hash.
-          </div>
-          <input
-            value={simpleMessage}
-            placeholder="Hello world!"
-            onChange={event => {this.handleSimpleMessage(event)}}
-            disabled={selectedFile}
-          />
-
-          <h5 style={{marginBottom: 0, color: 'white'}}>Or, a larger file</h5>
-          <div className={styles.NoteWhite}>
-            In most cases, this file will contain a cipher text. It's up to you to encrypt your data - 
-            all we do is store your file for one year at a location defined by the file's hash.
-          </div>
-          <input type="file" onChange={(event)=>{this.handleFileChange(event)}} disabled={simpleMessage}/>
-
-          <h5 style={{marginBottom: 0, color: 'white'}}>Set channel</h5>
-          <div className={styles.NoteWhite}>
-            To help people find your casts, you can define a channel ID.
-            This could be something like 'VARNA', 'OMG_NEWS', or 'TOKTIK'.
-            People can then subscribe to those channels.
-          </div>
-          <input
-            value={channel ? channel : ""}
-            placeholder="Optional - channelID"
-            onChange={event => {this.handleChannel(event)}}
-          />
           <Button
             type='primary'
+            className={styles.button}
             style={{marginTop: 20}}
             loading={uploadButtonLoading}
-            disabled={(!simpleMessage && !selectedFile) || uploadButtonLoading}
+            disabled={!simpleMessage || uploadButtonLoading}
             onClick={()=>{this.handleHashcast()}}
           >
             {uploadButtonText}
@@ -338,52 +290,29 @@ class Hashcast extends React.Component {
           </div>
         </div>
 
-        <div className={styles.InputContainer}>
-
-          <div style={{background: '#C83950', padding: '5px', marginTop: '5px'}}>
-            <h3 style={{marginTop: 0, color: 'white'}}>Subscribe</h3>
-
-            <div className={styles.NoteWhite}>
-              When you subscribe, you will be notified of new casts on that channel. If you get an error, 
-              such as 'Channel does not exist', that means the channel has not been set up yet. You can 
-              set one up by Hashcasting.
+        <div className={styles.rightBoxContainer}>
+          <div className={styles.innerContainer}>
+            <div className={styles.basictext}>
+              Live Hashcasts
             </div>
-            <input
-              value={subscribedChannel ? subscribedChannel : ""}
-              placeholder="Subscribe to OMG_NEWS"
-              onChange={event => {this.handleSubscribeChannel(event)}}
-            />
-
-            <Button
-              type='primary'
-              style={{marginTop: 20}}
-              loading={subscribeChannelLoad}
-              disabled={!subscribedChannel || subscribeChannelLoad}
-              onClick={()=>{this.handleSubscribe()}}
-            >
-              {subscribeButtonText}
-            </Button>
-
-            {subscribeChannelError === false &&
-              <div className={styles.successMessageBox} onClick={()=>{window.open(pageURL.includes("labs.varna.ai") ? subscribedChannelURL.subscribedURL : subscribedChannelURL.subscribedURL.replace("https://labs.varna.ai/", "http://localhost:3000/"))}}>
-                {pageURL.includes("labs.varna.ai") ? subscribedChannelURL.subscribedURL : subscribedChannelURL.subscribedURL.replace("https://labs.varna.ai/", "http://localhost:3000/")}
-              </div>
-            }
-
-            {subscribeChannelError !== null && subscribeChannelError !== false &&
-              <div className={styles.errorMessageBox}>
-                Invalid channel
-              </div>
-            }
-          </div>
-
-          <div style={{background: 'white', marginTop: 10}}>
-            <h3 style={{marginTop: 0}}>My Hashcasts</h3>
-
-            <div className={styles.Note}>
-              Clicking {' '}<span className={styles.B}>PULL</span>{' '}
-              will download the associated file.
+            <div className={styles.buttonsContainer}>
+              <Button
+                className={styles.smallButton}
+                inactive={filterTag}
+                onClick={()=>{this.hanldeShowAll()}}
+              >
+                Show All
+              </Button>
+              <input
+                value={filterTag}
+                className={`${styles.input} ${styles.smallInput}`}
+                style={{margin: 0}}
+                placeholder="Show only hash casts tagged with..."
+                onChange={event => {this.handleFilterTag(event)}}
+              />
             </div>
+            
+            <div className={styles.hashcastContainer}>
 
               <Pager
                 currentPage={page}
@@ -394,7 +323,7 @@ class Hashcast extends React.Component {
               />
 
               {!paginatedHashcasts.length && (
-                <div className={styles.Disclaimer}>No More Hashcasts.</div>
+                <div className={styles.basictext}>No More Hashcasts.</div>
               )}
 
               {paginatedHashcasts && paginatedHashcasts.map((v,i) => {
@@ -406,10 +335,11 @@ class Hashcast extends React.Component {
                 )
               })}
 
+            </div>
+
           </div>
         </div>
       </div>
-
     )
   }
 }

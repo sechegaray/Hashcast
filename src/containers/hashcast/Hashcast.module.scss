@@ -1,138 +1,101 @@
 @import 'index.scss';
 
-.Container {
+.container {
   margin-bottom: 20px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  align-content: flex-start;
-  padding-left: 5px;
-  padding-top: 5px;
+  justify-content: flex-start;
+  padding: 10px;
   position: relative;
   background: white;
-  @include mobile {
-    padding-right: 5px;
-  }
 }
 
-.Note {
-  font-size: 0.8em;
-  font-style: italic;
-  color: $gray3;
-}
-
-.B {
-  font-family: MessinaMonoBold;
-  font-style: unset;
-  color: black;
-}
-
-.NoteWhite {
-  font-size: 0.8em;
-  font-style: italic;
-  color: $gray6;
-  margin-top: 5px; 
-  margin-bottom: 5px;
-}
-
-.title {
-  color: $gray6;
-  font-size: 1em;
-  margin-bottom: 10px;
-}
-
-.InputContainer {
-  margin-bottom: 10px;
-  margin-right: 10px;
-  width: $maxWidth;
+.leftBoxContainer {
+  display: inline-block;
   padding: 5px;
-
-  @include mobile {
-    margin-right: unset;
-  }
-
+  width: 30%;
+  min-width: 300px;
 }
 
-.HistoryContainer {
-
-  margin-bottom: 10px;
-  margin-right: 10px;
-  width: $maxWidth;
-
-  @include mobile {
-    width: 100%;
-    margin-right: unset;
-  }
-
-  .BuyItemContainer {
-    margin: 0;
-    padding: 0;
-    color: $gray5;
-    background-color: $gray1;
-  }
-
+.rightBoxContainer {
+  display: inline-block;
+  padding: 5px;
+  width: 60%;
+  min-width: 300px;
 }
 
-.Disclaimer {
-  font-size: 0.8em;
-  margin-top: 10px;
+.innerContainer {
+  border: 2px solid $blue5;
+  border-radius: 10px;
+  padding: 10px;
 }
 
-.statusRed {
-  margin-left: 5px;
-  color: $red;
-}
-
-.statusBar {
+.buttonsContainer {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-.statusGreen {
-  margin-left: 5px;
-  color: $green;
-  .loading {
-    margin-left: 5px;
-    margin-top: 2px;
-  }
+.hashcastContainer {
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
-.NotificationBox {
+.basictext {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
 
-  background-color: $red;
-  position: absolute;
-  font-size: 1em;
-  padding: 15px;
-  padding-right: 20px;
-  color: white;
-  right: 0;
+.input {
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: $gray3;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: $gray7;
+  background-clip: padding-box;
+  border: 1px solid $gray6;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  max-width: 460px;
+}
+
+.input:focus {
+  color: #495057;
+  background-color: $gray7;
+  border-color: $blue4;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem $blue5;
+}
+
+.button {
   border-radius: 10px;
+  background-color: $blue2;
+  color: white;
+}
 
-  .icon {
-    width: 15px;
-    height: 15px;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    cursor: pointer;
+
+.smallButton {
+  border-radius: 10px;
+  background-color: $blue2;
+  width: 30%;
+  flex: none;
+  color: white;
+}
+
+.smallInput {
+  width: 50%;
+}
+
+@media screen and (max-width: 820px) {
+  .leftBoxContainer {
+    width: 100%;
   }
-}
-
-.errorMessageBox {
-  background-color: $red;
-  padding: 20px;
-  max-width: $maxWidth;
-  color: white;
-  margin-top: 10px;
-}
-
-
-.successMessageBox {
-  background-color: $green;
-  padding: 20px;
-  max-width: $maxWidth;
-  color: white;
-  margin-top: 10px;
-  word-break: break-all;
-  cursor: pointer;
+  .rightBoxContainer{
+    width: 100%;
+  }
 }

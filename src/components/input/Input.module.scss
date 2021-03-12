@@ -19,7 +19,7 @@
     flex-direction: row;
     align-items: center;
     &:focus-within {
-      border: 2px solid $blue;
+      border: 2px solid $blue1;
     }
     .icon {
       margin-right: 10px;
@@ -39,7 +39,7 @@
       align-items: center;
     }
     .paste {
-      color: $blue;
+      color: $blue1;
       margin-left: 10px;
       cursor: pointer;
     }
@@ -54,7 +54,7 @@
 }
 
 .maxValue {
-  background-color: $blue;
+  background-color: $blue1;
   opacity: 0.8;
   color: white;
   padding: 3px 7px;
