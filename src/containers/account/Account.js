@@ -89,7 +89,7 @@ function Account () {
     <div className={styles.Account}>
 
       <div className={styles.wallet}>
-        <span className={styles.address}>{`Wallet Address : ${wAddress}`}</span>
+        <span className={styles.address}>{`Wallet Address: ${wAddress}`}</span>
         <Copy value={networkService.account} />
       </div>
 

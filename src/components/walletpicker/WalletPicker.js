@@ -33,7 +33,7 @@ import { openModal } from 'actions/uiAction';
 import { setWalletMethod, setNetwork } from 'actions/setupAction';
 import { getAllNetworks } from 'util/networkName';
 
-import logo from 'images/omg_labs.svg';
+import logo from 'images/hashcast.svg';
 import chevron from 'images/chevron.svg';
 import browserwallet from 'images/browserwallet.png';
 import * as styles from './WalletPicker.module.scss';
@@ -200,9 +200,9 @@ function WalletPicker ({ onEnable }) {
           
           <div className={styles.Title}>
             <br/>
-            <br/>Welcome, explorer, to Hashcast, a simple messaging layer for Plasma. Athough Hashcast is 
+            <br/>Welcome to Hashcast, a simple messaging layer for Plasma. Athough Hashcast is 
             primarily designed to facilitate inter-chain and cross-chain coordination, we are releasing 
-            this simple frontend to make it easy to explore and use the system.
+            this simple frontend to make it easy to explore and get a sense for what this system does.
             <br/>
             <br/>
           </div>

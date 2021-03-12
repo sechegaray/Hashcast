@@ -56,7 +56,7 @@ import Hashcast from 'containers/hashcast/Hashcast';
 import MobileHeader from 'components/mobileheader/MobileHeader';
 import MobileMenu from 'components/mobilemenu/MobileMenu';
 
-import logo from 'images/omg_labs.svg';
+import logo from 'images/hashcast.svg';
 import * as styles from './Home.module.scss';
 
 const POLL_INTERVAL = config.pollInterval * 1000;

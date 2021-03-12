@@ -47,10 +47,8 @@ class HashcastHistoryBox extends React.Component {
           {/* Left part */}
           <div className={styles.topLeftContainerHC}>
             <div className={styles.lineHC}>Hashcast: {data.msg}</div>
-            <div className={styles.lineHC}>ID: {data.hcID.slice(0, 13)}</div>
-            <div className={styles.lineHC}>Block: {data.blockNum}</div>
-            <div className={styles.lineHC}>Tag: {data.tag ? data.tag : 'Null' }</div>
-            <div className={styles.lineHC}>{moment.unix(data.time).format('lll')}</div>
+            <div className={styles.lineHC}>Block: {data.blockNum} ID: {data.hcID.slice(0, 13)}</div>
+            <div className={styles.lineHC}>{moment.unix(data.time).format('lll')} Tag: {data.tag ? data.tag : 'Null' }</div>
             {data.hashcastMessage[data.msg] && 
               <div className={styles.lineHC}>Message:{" "}
                 {data.hashcastMessage[data.msg].length > 100 ? 

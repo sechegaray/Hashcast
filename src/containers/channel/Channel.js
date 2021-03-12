@@ -24,7 +24,7 @@ import { verifyChannelID } from 'actions/hashcastAction';
 import { openError } from 'actions/uiAction';
 import Button from 'components/button/Button';
 
-import omgLabsLogo from 'images/omg_labs.svg';
+import logo from 'images/hashcast.svg';
 
 import * as styles from './Channel.module.scss';
 
@@ -86,7 +86,7 @@ class Channel extends React.Component {
       return (
         <div className={styles.channelContainer}>
           <div className={styles.varnaLogoContainer} >
-            <img src={omgLabsLogo} className={styles.varnaLogo} alt="" onClick={()=>{this.props.history.push("/")}}/>
+            <img src={logo} className={styles.varnaLogo} alt="" onClick={()=>{this.props.history.push("/")}}/>
           </div>
 
           <div>
