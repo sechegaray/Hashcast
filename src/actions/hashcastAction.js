@@ -148,6 +148,9 @@ const verifyHashIDFailure = (data) => ({
   payload: data,
 })
 
+/**********************************/
+/************ Hashcast ************/
+/**********************************/
 export const updateHashcastMessageWaitingList = (data) => ({
   type: 'UPDATE_HASHCAST_MESSAGE_WAITING_LIST',
   payload: data,
@@ -167,6 +170,30 @@ const getHashcastMessageFailure = (hashID, error) => ({
   type: 'LOAD_HASHCAST_MESSAGE_FAILURE',
   payload: { hashID, error },
 })
+
+/*********************************/
+/************ CHANNEL ************/
+/*********************************/
+export const updateChannelMessageWaitingList = (data) => ({
+  type: 'UPDATE_CHANNEL_MESSAGE_WAITING_LIST',
+  payload: data,
+})
+
+const getChannelMessageBegin = (hashID) => ({
+  type: 'LOAD_CHANNEL_MESSAGE',
+  payload: { hashID },
+})
+
+const getChannelMessageSuccess = (hashID, channelMessage) => ({
+  type: 'LOAD_CHANNEL_MESSAGE_SUCCESS',
+  payload: { hashID, channelMessage },
+})
+
+const getChannelMessageFailure = (hashID, error) => ({
+  type: 'LOAD_CHANNEL_MESSAGE_FAILURE',
+  payload: { hashID, error },
+})
+/*********************************/
 
 const configureHashcastToPlasma = (hashID) => async (dispatch) => {
 
@@ -339,7 +366,7 @@ export const sendHashcastFile = (file, channel) => (dispatch) => {
     const hashID = md5(e.target.result);
     dispatch(getUploadHashcastFileURL(channel, hashID, file.type)).then(data => {
       if (data !== "") {
-        dispatch(uploadHashcastFile(file, data.url)).then(statusCode => {
+        dispatch(uploadHashcastFile(e.target.result, data.url)).then(statusCode => {
           if (statusCode === 200) {
             dispatch(configureHashcastToPlasma(hashID));
           }
@@ -347,7 +374,7 @@ export const sendHashcastFile = (file, channel) => (dispatch) => {
       }
     })
   };
-  fileReader.readAsBinaryString(file);
+  fileReader.readAsDataURL(file);
 }
 
 export const hashpullGetUrl = (hashID) => (dispatch) => {
@@ -515,5 +542,45 @@ export const getHashcastMessage = (hashID, hashcastMessageWaitingList) => async 
     }
   } else {
     dispatch(getHashcastMessageFailure(hashID, 404));
+  }
+}
+
+export const findChannelWaitingList = (
+  verifiedHashID, 
+  channelMessageLoad, 
+  channelMessageWaitingList
+) => (dispatch) => {
+  const channelMessageWaitingListTemp = [...channelMessageWaitingList];
+  
+  for (let eachHashIDObj of verifiedHashID) {
+
+    const filteredChannelMessageWaitingList = channelMessageWaitingList.filter(
+      element => element.hahsID === eachHashIDObj
+    )
+    if (typeof channelMessageLoad[eachHashIDObj] === 'undefined' && 
+      filteredChannelMessageWaitingList.length === 0) {
+        channelMessageWaitingListTemp.push({ hashID: eachHashIDObj });
+    }
+  }
+
+  dispatch(updateChannelMessageWaitingList(channelMessageWaitingListTemp));
+  return channelMessageWaitingListTemp
+}
+
+export const getChannelMessage = (hashID, channelMessageWaitingList) => async (dispatch) => {
+  dispatch(getChannelMessageBegin(hashID));
+  const channelMessage = await hashPull(hashID);
+
+  const channelMessageWaitingListTemp = channelMessageWaitingList.filter(i => i.hashID !== hashID);
+  dispatch(updateChannelMessageWaitingList(channelMessageWaitingListTemp));
+
+  if (channelMessage !== "") {
+    if (channelMessage.status === 'success') {
+      dispatch(getChannelMessageSuccess(hashID, channelMessage.ciphertext));
+    } else {
+      dispatch(getChannelMessageFailure(hashID, 404));
+    }
+  } else {
+    dispatch(getChannelMessageFailure(hashID, 404));
   }
 }

@@ -37,16 +37,17 @@
 }
 
 .channelItemContainer {
-  background-color: $bunnyRed;
+  background-color: $blue2;
   padding: 7px;
   box-sizing: border-box;
   transition: all 200ms ease-in-out;
   margin-bottom: 5px;
   position: relative;
+  border-radius: 3px;
 }
 
 .line {
-  color: $gray6;
+  color: white;
   font-size: 0.8em;
   padding-Top: 3px;
 }

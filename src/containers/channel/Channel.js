@@ -19,10 +19,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import { isEqual, orderBy } from 'lodash';
 
-import { verifyChannelID } from 'actions/hashcastAction';
+import { verifyChannelID, getChannelMessage, findChannelWaitingList } from 'actions/hashcastAction';
 import { openError } from 'actions/uiAction';
-import Button from 'components/button/Button';
 
 import logo from 'images/hashcast.svg';
 
@@ -32,12 +32,24 @@ class Channel extends React.Component {
   constructor(props) {
     super(props);
     
-    const { channelSummary, verifyChannelError } = this.props.hashcast;
+    const { 
+      channelSummary, 
+      verifyChannelError,
+      channelMessageWaitingList,
+      currentchannelMessageHashID,
+      channelMessage,
+      channelMessageLoad,
+    } = this.props.hashcast;
 
     this.state = {
       channelID: null,
       channelSummary,
       verifyChannelError,
+      channelMessageWaitingList,
+      currentchannelMessageHashID,
+      channelMessage,
+      channelMessageLoad,
+      autoRefesh: 60,
     }
   }
 
@@ -46,11 +58,28 @@ class Channel extends React.Component {
     let urlSplitted = url.split("/");
     const channelID = urlSplitted[urlSplitted.length - 1];
     this.props.dispatch(verifyChannelID(channelID));
+    setInterval(() => { 
+      console.log("Scan the channel!");
+      this.props.dispatch(verifyChannelID(channelID));
+      this.setState({ autoRefesh: 60 });
+    }, 60 * 1000);
+    
+    setInterval(() => { 
+      this.setState({ autoRefesh: this.state.autoRefesh - 1 });
+    }, 1000);
+
     this.setState({ channelID });
   }
 
   componentDidUpdate(prevState) {
-    const { channelSummary, verifyChannelError } = this.props.hashcast;
+    const { 
+      channelSummary, 
+      verifyChannelError,
+      channelMessageWaitingList,
+      currentchannelMessageHashID,
+      channelMessage,
+      channelMessageLoad,
+    } = this.props.hashcast;
 
     if (prevState.hashcast.channelSummary !== channelSummary) {
       this.setState({ channelSummary });
@@ -63,17 +92,68 @@ class Channel extends React.Component {
         this.props.history.push("/");
         this.props.dispatch(openError("Invalid channel ID!"));
       }
+
+      if (verifyChannelError === false) {
+        const sortedChannelItems = orderBy(channelSummary.channelItems, 'timestamp', 'desc');
+        const channelMessageWaitingListTemp = this.props.dispatch(findChannelWaitingList(
+          sortedChannelItems.reduce((acc, cur) =>{ acc.push(cur.hashID); return acc; },[]),
+          channelMessageLoad,
+          channelMessageWaitingList,
+        ));
+
+        // start to get hashcast message
+        if ((currentchannelMessageHashID === null && channelMessageWaitingListTemp.length) ||
+          channelMessageWaitingListTemp.length === 1) {
+          this.props.dispatch(getChannelMessage(
+            channelMessageWaitingListTemp[0].hashID,
+            channelMessageWaitingListTemp,
+          ));
+        }
+      }
+    }
+
+    if (!isEqual(prevState.hashcast.channelMessageLoad, channelMessageLoad)) {
+      this.setState({ channelMessageLoad });
+
+      if (prevState.hashcast.channelMessageLoad[currentchannelMessageHashID] !== 
+        channelMessageLoad[currentchannelMessageHashID] &&
+        channelMessageLoad[currentchannelMessageHashID] === false &&
+        channelMessageWaitingList.length
+      ) {
+        this.props.dispatch(getChannelMessage(
+          channelMessageWaitingList[0].hashID,
+          channelMessageWaitingList,
+        ));
+      }
+    }
+
+    if (!isEqual(channelMessageWaitingList, channelMessageWaitingList)) {
+      this.setState({ channelMessageWaitingList });
+    }
+
+    if (prevState.hashcast.currentchannelMessageHashID !== currentchannelMessageHashID) {
+      this.setState({ currentchannelMessageHashID });
+    }
+
+    if (!isEqual(prevState.hashcast.channelMessage, channelMessage)) {
+      this.setState({ channelMessage });
     }
   }
 
-  handleRefresh() {
-    const { channelID } = this.state;
-    this.props.dispatch(verifyChannelID(channelID));
-  }
-
   render() {
-    const { verifyChannelError, channelID, channelSummary } = this.state;
-    console.log(channelSummary);
+    const { 
+      verifyChannelError, 
+      channelID, 
+      channelSummary, 
+      channelMessage,
+      autoRefesh,
+    } = this.state;
+
+    let sortedChannelItems = [];
+    if (channelSummary.channelItems) {
+      sortedChannelItems = orderBy(channelSummary.channelItems, 'timestamp', 'desc');
+    }
+
     if (verifyChannelError === null) {
       return (
         <div className={styles.channelContainerCenter}>
@@ -90,17 +170,13 @@ class Channel extends React.Component {
           </div>
 
           <div>
-            <div style={{display: 'inline-block', verticalAlign: 'top'}}>
-              <h2>Channel: {channelSummary.channelName}</h2>
-              <h2>Channel ID: {channelID}</h2>
-              <h2>Last updated: {moment.unix(channelSummary.lastUpdated / 1000).format('lll')}</h2>
-            </div>
-            <div style={{display: 'inline-block', verticalAlign: 'top', float: 'right'}}>
-              <Button className={styles.smallButton} onClick={()=>{this.handleRefresh()}}>Refresh</Button>
-            </div>
+            <h2>Channel: {channelSummary.channelName}</h2>
+            <h2>Channel ID: {channelID}</h2>
+            <h2>Last updated: {moment.unix(channelSummary.lastUpdated / 1000).format('lll')}</h2>
+            <h2>Auto refresh in {autoRefesh} seconds</h2>
           </div>
 
-          {channelSummary.channelItems.map((v,i) => {
+          {sortedChannelItems.map((v,i) => {
             return (
               <div className={styles.channelItemContainer} key={i}>
                 <div className={styles.line}>
@@ -112,6 +188,25 @@ class Channel extends React.Component {
                 <div className={styles.line}>
                   Time: {moment(v.timestamp).format('lll')}
                 </div>
+                {channelMessage[v.hashID] && 
+                  ((channelMessage[v.hashID].includes("data:image") &&
+                  channelMessage[v.hashID].includes("base64")) ?
+                    <>
+                      <div className={styles.line}> Image:</div>
+                      <img 
+                        src={channelMessage[v.hashID]}
+                        alt="hashcast"
+                        style={{width: '100%', maxWidth: 500}}
+                      />
+                    </>:
+                    <div className={styles.line}>Message:{" "}
+                      {channelMessage[v.hashID].length > 100 ? 
+                        `${channelMessage[v.hashID].slice(0, 100)}...` :
+                        `${channelMessage[v.hashID]}`
+                      }
+                    </div>
+                  )
+                }
               </div>
             )
           })}

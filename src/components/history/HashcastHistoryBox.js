@@ -50,31 +50,25 @@ class HashcastHistoryBox extends React.Component {
             <div className={styles.lineHC}>Block: {data.blockNum} ID: {data.hcID.slice(0, 13)}</div>
             <div className={styles.lineHC}>{moment.unix(data.time).format('lll')} Tag: {data.tag ? data.tag : 'Null' }</div>
             {data.hashcastMessage[data.msg] && 
-              <div className={styles.lineHC}>Message:{" "}
-                {data.hashcastMessage[data.msg].length > 100 ? 
-                  `${data.hashcastMessage[data.msg].slice(0, 100)}...` :
-                  `${data.hashcastMessage[data.msg]}`
-                }
-              </div>
+              ((data.hashcastMessage[data.msg].includes("data:image") &&
+                data.hashcastMessage[data.msg].includes("base64")) ?
+                <>
+                  <div className={styles.lineHC}> Image:</div>
+                  <img 
+                    src={data.hashcastMessage[data.msg]}
+                    alt="hashcast"
+                    style={{width: '100%', maxWidth: 500}}
+                  />
+                </>:
+                <div className={styles.lineHC}>Message:{" "}
+                  {data.hashcastMessage[data.msg].length > 100 ? 
+                    `${data.hashcastMessage[data.msg].slice(0, 100)}...` :
+                    `${data.hashcastMessage[data.msg]}`
+                  }
+                </div>
+              )
             }
           </div>
-
-          {/* Right part
-          {
-            <div className={styles.topRightContainerHC}>
-              <div className={styles.buttonContainer}>
-                <Button 
-                  type='primary'
-                  size='tiny'
-                  className={styles.button}
-                  onClick={()=>{this.handleHashPull()}}
-                  disabled={data.hashpullGetUrlLoad[data.msg]}
-                >
-                  Pull
-                </Button>
-              </div>
-            </div>
-          } */}
         </div>
 
       </div>
