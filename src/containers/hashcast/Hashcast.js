@@ -303,7 +303,13 @@ class Hashcast extends React.Component {
   }
 
   handleFileChange(event) {
-    this.setState({ selectedFile: event.target.files[0] });
+    const fileSize = event.target.files[0].size;
+    if (fileSize < 1024 * 64) {
+      this.setState({ selectedFile: event.target.files[0] });
+    } else {
+      this.props.dispatch(openError('File size exceeds 64kb'));
+      event.target.value = null;
+    }
   }
 
   /*********************************************/
@@ -417,7 +423,7 @@ class Hashcast extends React.Component {
               disabled={selectedFile}
             />
             <div className={styles.basictext}>
-              Select your image
+              Select your image (max size 64kb)
             </div>
             <input 
               type="file" 
