@@ -23,10 +23,14 @@ import { isEqual, orderBy } from 'lodash';
 
 import { verifyChannelID, getChannelMessage, findChannelWaitingList } from 'actions/hashcastAction';
 import { openError } from 'actions/uiAction';
+import Pager from 'components/pager/Pager';
+import { hashSlice } from 'util/transactionSort';
 
 import logo from 'images/hashcast.svg';
 
 import * as styles from './Channel.module.scss';
+
+const PER_PAGE = 4;
 
 class Channel extends React.Component {
   constructor(props) {
@@ -42,6 +46,7 @@ class Channel extends React.Component {
     } = this.props.hashcast;
 
     this.state = {
+      page: 1,
       channelID: null,
       channelSummary,
       verifyChannelError,
@@ -142,6 +147,7 @@ class Channel extends React.Component {
 
   render() {
     const { 
+      page,
       verifyChannelError, 
       channelID, 
       channelSummary, 
@@ -153,6 +159,14 @@ class Channel extends React.Component {
     if (channelSummary.channelItems) {
       sortedChannelItems = orderBy(channelSummary.channelItems, 'timestamp', 'desc');
     }
+
+    const paginatedHashcasts = hashSlice(page, PER_PAGE, sortedChannelItems);
+
+    //needed for the total number of pages so we can display Page X of Y
+    let totalNumberOfPages = Math.ceil(sortedChannelItems.length / PER_PAGE);
+
+    //if totalNumberOfPages === 0, set to one so we don't get the "Page 1 of 0" display glitch
+    if (totalNumberOfPages === 0) totalNumberOfPages = 1;
 
     if (verifyChannelError === null) {
       return (
@@ -175,6 +189,14 @@ class Channel extends React.Component {
             <h2>Last updated: {moment.unix(channelSummary.lastUpdated / 1000).format('lll')}</h2>
             <h2>Auto refresh in {autoRefesh} seconds</h2>
           </div>
+
+          <Pager
+            currentPage={page}
+            totalPages={totalNumberOfPages}
+            isLastPage={paginatedHashcasts.length < PER_PAGE}
+            onClickNext={()=>this.setState({page:page+1})}
+            onClickBack={()=>this.setState({page:page-1})}
+          />
 
           {sortedChannelItems.map((v,i) => {
             return (
