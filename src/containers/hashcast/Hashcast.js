@@ -413,7 +413,7 @@ class Hashcast extends React.Component {
         <div className={styles.leftBoxContainer}>
           <div className={styles.innerContainer}>
             <div className={styles.basictext}>
-              Enter a simple text message...
+              Hashcast a simple text message...
             </div>
             <input
               value={simpleMessage}
