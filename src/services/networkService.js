@@ -463,8 +463,17 @@ class NetworkService {
   }) {
 
     if (!utxos || !utxos.length) {
-      console.log("async getTransferTypedData: Sorry, you did not provide an UTXO")
-      return
+      try {
+        const _utxos = await this.childChain.getUtxos(this.account);
+        utxos = orderBy(_utxos, i => i.amount, 'desc');
+      } catch (error) {
+        throw new WebWalletError({
+          originalError: error,
+          customErrorMessage: 'Could not fetch account utxos. Please select them manually.',
+          reportToSentry: false,
+          reportToUi: true
+        });
+      }
     }
 
     const allFees = await this.fetchFees();

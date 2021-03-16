@@ -423,7 +423,7 @@ class Hashcast extends React.Component {
               disabled={selectedFile}
             />
             <div className={styles.basictext}>
-              Or, hashcast an image (max size 1MB)
+              Or, hashcast an image (&le;1MB)
             </div>
             <input 
               type="file" 

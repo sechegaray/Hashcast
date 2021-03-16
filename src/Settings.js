@@ -4,4 +4,4 @@ export const SERVICE_API_URL = 'https://mg0gv4bmu9.execute-api.us-west-1.amazona
 export const HASHCAST_API_URL = 'https://hsj4abmlzi.execute-api.us-west-1.amazonaws.com/prod/';
 export const WEBSOCKET_API_URL = 'wss://hxpkicwmek.execute-api.us-west-1.amazonaws.com/prod';
 
-export const VERSION = '1.0.6';
+export const VERSION = '1.0.7';
