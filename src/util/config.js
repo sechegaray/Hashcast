@@ -20,5 +20,5 @@ export default {
   pollInterval: env('POLL_INTERVAL'),
   sentry: env('SENTRY_DSN'),
   gtmId: env('GTM_ID'),
-  rpcProxy: env('RPC_PROXY')
+  rpcProxy: env('RPC_PROXY'),
 };

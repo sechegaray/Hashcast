@@ -129,6 +129,18 @@ function Home () {
 
   useEffect(() => {
     setPageDisplay("AccountNow");
+    if (config.gtmId) {
+      const scriptTag = document.createElement('script');
+      scriptTag.src = `https://www.googletagmanager.com/gtm.js?id=${config.gtmId}`;
+      scriptTag.async = true;
+      document.body.appendChild(scriptTag);
+      const iframeTag = document.createElement('iframe');
+      iframeTag.src =`https://www.googletagmanager.com/ns.html?id=${config.gtmId}`;
+      iframeTag.height = 0;
+      iframeTag.width = 0;
+      iframeTag.style = 'display:none;visibility:hidden';
+      document.body.appendChild(iframeTag);
+    }
   },[]);
 
   return (
