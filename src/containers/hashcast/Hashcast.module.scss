@@ -1,28 +1,36 @@
 @import 'index.scss';
 
 .container {
-  margin-bottom: 20px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
-  padding: 10px;
+  padding: 1px;
   position: relative;
   background: white;
+}
+
+.postCastContainer {
+  display: inline-block;
+  border: 0px solid $blue2;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 0px;
+  width: 100%;
 }
 
 .leftBoxContainer {
   display: inline-block;
   padding: 5px;
-  width: 30%;
+  width: 60%;
   min-width: 300px;
 }
 
 .rightBoxContainer {
   display: inline-block;
   padding: 5px;
-  width: 65%;
-  min-width: 300px;
+  width: 20%;
+  min-width: 100px;
 }
 
 .bottomBoxContainer {
@@ -33,10 +41,10 @@
 }
 
 .innerContainer {
-  border: 2px solid $blue2;
+  border: 0px solid $blue2;
   border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 0px;
+  margin-bottom: 0px;
 }
 
 .buttonsContainer {
@@ -44,22 +52,26 @@
   flex-direction: row;
   justify-content: space-between;
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 }
 
 .hashcastContainer {
-  margin-top: 20px;
+  margin-top: 0px;
   margin-bottom: 10px;
 }
 
 .basictext {
   padding-top: 5px;
   padding-bottom: 5px;
+  display:inline-block;
 }
 
 .input {
   display: block;
   font-size: 1rem;
+  display:inline-block;
+  margin-right: 2px;
+
   line-height: 1.5;
   color: $gray3;
   margin-top: 5px;
@@ -86,11 +98,87 @@
   font-size: 13px;
 }
 
+.inputtag {
+  margin-right: 2px;
+  font-size: 1rem;
+  display:inline-block;
+  line-height: 1.5;
+  color: $gray3;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: $gray7;
+  background-clip: padding-box;
+  border: 1px solid $gray6;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  max-width: 160px;
+  font-size: 13px;
+  font-family: 'MessinaMono', monospace;
+}
+
+
+
+.inputtag:focus {
+  color: #495057;
+  background-color: $gray7;
+  border-color: $blue4;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem $blue5;
+}
+
+.inputtag::placeholder {
+  font-size: 13px;
+}
+
+.inputImage {
+  visibility:hidden;
+  display: none;
+}
+
+.inputImageContainer {
+  display:inline;
+
+}
+
+
+.inputImageButton {
+  visibility:hidden;
+  display: none;
+}
+
+.label {
+  display: block;
+  font-size: 1rem;
+  display:inline-block;
+  line-height: 1.5;
+  margin-right: 2px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  color: $gray3;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: $gray7;
+  background-clip: padding-box;
+  border: 1px solid $gray6;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  max-width: 460px;
+  font-size: 13px;
+  font-family: 'MessinaMono', monospace;
+
+}
+
 .button {
   border-radius: 10px;
   background-color: $blue2;
   color: white;
+  display:inline-block;
+  min-width: 40px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top: 0px !important;
 }
+
 
 .smallButton {
   border-radius: 10px;

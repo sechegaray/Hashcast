@@ -1,8 +1,9 @@
 @import 'index.scss';
 
 .container { 
-  background-color: $blue2;
-  padding: 7px;
+  //background-color: $blue2;
+  background-color: $blue5;
+  padding: 0px;
   box-sizing: border-box;
   transition: all 200ms ease-in-out;
   margin-bottom: 5px;
@@ -13,6 +14,7 @@
     background: blue1;
     animation: pulseAnimation 2s infinite;
   }
+  width: 100%;
 
 }
 
@@ -28,8 +30,14 @@
 }
 
 .lineHC {
-  color: white;
+  color: black;
   font-size: 0.8em;
+  padding-Top: 3px;
+}
+
+.taglineHC {
+  color: $gray3;
+  font-size: 0.7em;
   padding-Top: 3px;
 }
 
@@ -115,6 +123,11 @@
     min-width: 180px;
   }
 
+  .dateLine {
+    text-align: left;
+    font-size: smaller;
+  }
+
   .topRightContainer {
 
     width: 60%;
@@ -194,4 +207,30 @@
   max-height: 200px;
   padding: 3px;
   margin-top: 3px;
+}
+
+
+.infobox {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  font-size: 0.8em;
+  padding-Top: 3px;
+
+}
+
+.statusLine {
+  display: flex;
+  padding-right: 10px;
+  border-top: 1px solid $gray2;
+  color: $gray3;
+  font-size: smaller;
+}
+
+.statusTitle {
+  font-weight: bold;
+}
+
+.tag {
+
 }

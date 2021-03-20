@@ -155,6 +155,8 @@ class Hashcast extends React.Component {
     this.props.dispatch(checkVersion());
 
     this.setState({ transactions: sortedData.orderedTransactions });
+
+
   }
 
   componentDidUpdate(prevState) {
@@ -409,94 +411,50 @@ class Hashcast extends React.Component {
     if (totalNumberOfPages === 0) totalNumberOfPages = 1;
 
     return (
+      <div>
       <div className={styles.container}>
-        <div className={styles.leftBoxContainer}>
-          <div className={styles.innerContainer}>
-            <div className={styles.basictext}>
-              Hashcast a simple text message...
-            </div>
-            <input
+        <div className={styles.postCastContainer}>
+          <input
+              value={channel}
+              className={styles.inputtag}
+              placeholder="#Tag (optional)"
+              onChange={event => {this.handleChannel(event)}}
+          />
+          <input
               value={simpleMessage}
               className={styles.input}
-              placeholder="Hello world!"
+              placeholder="Type your message to the world..."
               onChange={event => {this.handleSimpleMessage(event)}}
               disabled={selectedFile}
-            />
-            <div className={styles.basictext}>
-              Or, hashcast an image (&le;1MB)
-            </div>
-            <input 
-              type="file" 
-              className={styles.input}
-              accept="image/*"
-              onChange={(event)=>{this.handleFileChange(event)}} 
-              disabled={simpleMessage}
-            />
-            <div className={styles.basictext}>
-              Add channel tag
-            </div>
-            <input
-              value={channel}
-              className={styles.input}
-              placeholder="Optional"
-              onChange={event => {this.handleChannel(event)}}
-            />
-            <Button
+          />
+          <div className={styles.inputImageContainer}>
+                <label for="files" class="btn" className={styles.label} disabled={simpleMessage}>
+                  Upload an Image (&le;1MB)
+                </label>
+              <input
+                  id="files"
+                  type="file"
+                  className={styles.inputImage}
+                  accept="image/*"
+                  onChange={(event)=>{this.handleFileChange(event)}}
+                  disabled={simpleMessage}
+              />
+          </div>
+          <Button
               type='primary'
               className={styles.button}
-              style={{marginTop: 20}}
               loading={uploadButtonLoading}
               disabled={(!simpleMessage && !selectedFile) || uploadButtonLoading}
               onClick={()=>{this.handleHashcast()}}
-            >
-              {uploadButtonText}
-            </Button>
-          </div>
-          <div className={styles.innerContainer}>
-            <div className={styles.basictext}>
-              Enter channel tag
-            </div>
-            <input
-              value={subscribedChannel}
-              className={styles.input}
-              placeholder="Subscribe to OMG"
-              onChange={event => {this.handleSubscribeChannel(event)}}
-            />
-            <Button
-              type='primary'
-              className={styles.button}
-              style={{marginTop: 20}}
-              loading={subscribeChannelLoad}
-              disabled={!subscribedChannel || subscribeChannelLoad}
-              onClick={()=>{this.handleSubscribe()}}
-            >
-              {subscribeButtonText}
-            </Button>
-          </div>
+          >
+            {uploadButtonText}
+          </Button>
         </div>
-
-        <div className={styles.rightBoxContainer}>
+      </div>
+    <div className={styles.container}>
+        <div className={styles.leftBoxContainer}>
           <div className={styles.innerContainer}>
-            <div className={styles.basictext}>
-              Live Hashcasts
-            </div>
-            <div className={styles.buttonsContainer}>
-              <Button
-                className={styles.smallButton}
-                inactive={filterTag}
-                onClick={()=>{this.hanldeShowAll()}}
-              >
-                Show All
-              </Button>
-              <input
-                value={filterTag}
-                className={`${styles.input} ${styles.smallInput}`}
-                style={{margin: 0}}
-                placeholder="Show only hashcasts tagged with..."
-                onChange={event => {this.handleFilterTag(event)}}
-              />
-            </div>
-            
+
             <div className={styles.hashcastContainer}>
 
               <Pager
@@ -525,6 +483,57 @@ class Hashcast extends React.Component {
           </div>
         </div>
 
+      <div className={styles.rightBoxContainer}>
+            <div className={styles.innerContainer}>
+
+              <div className={styles.basictext}>
+                Live Hashcasts
+              </div>
+              <div className={styles.buttonsContainer}>
+                <Button
+                    className={styles.smallButton}
+                    inactive={filterTag}
+                    onClick={()=>{this.hanldeShowAll()}}
+                >
+                  Show All my Casts
+                </Button>
+              </div>
+              <div className={styles.buttonsContainer}>
+                <input
+                    value={filterTag}
+                    className={`${styles.input}`}
+                    style={{margin: 0}}
+                    placeholder="Filter by tag..."
+                    onChange={event => {this.handleFilterTag(event)}}
+                />
+              </div>
+              <p></p>
+              <div className={styles.basictext}>
+                Enter channel tag
+              </div>
+              <input
+                  value={subscribedChannel}
+                  className={styles.input}
+                  placeholder="Subscribe to OMG"
+                  onChange={event => {this.handleSubscribeChannel(event)}}
+              />
+              <Button
+                  type='primary'
+                  className={styles.button}
+                  style={{marginTop: 20}}
+                  loading={subscribeChannelLoad}
+                  disabled={!subscribedChannel || subscribeChannelLoad}
+                  onClick={()=>{this.handleSubscribe()}}
+              >
+                {subscribeButtonText}
+              </Button>
+            </div>
+
+
+
+      </div>
+
+    </div>
       </div>
     )
   }
