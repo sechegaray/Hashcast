@@ -426,7 +426,7 @@ class Hashcast extends React.Component {
               placeholder="Type your message to the world..."
               onChange={event => {this.handleSimpleMessage(event)}}
               disabled={selectedFile}
-          />
+          /> or &nbsp;
           <div className={styles.inputImageContainer}>
                 <label for="files" class="btn" className={styles.label} disabled={simpleMessage}>
                   Upload an Image (&le;1MB)
@@ -495,7 +495,7 @@ class Hashcast extends React.Component {
                     inactive={filterTag}
                     onClick={()=>{this.hanldeShowAll()}}
                 >
-                  Show All my Casts
+                  Show All My Casts
                 </Button>
               </div>
               <div className={styles.buttonsContainer}>
@@ -509,12 +509,12 @@ class Hashcast extends React.Component {
               </div>
               <p></p>
               <div className={styles.basictext}>
-                Enter channel tag
+                Subscribe to Channel
               </div>
               <input
                   value={subscribedChannel}
                   className={styles.input}
-                  placeholder="Subscribe to OMG"
+                  placeholder='Enter channel tag (try "OMG")'
                   onChange={event => {this.handleSubscribeChannel(event)}}
               />
               <Button

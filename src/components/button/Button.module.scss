@@ -62,8 +62,9 @@
 
 /*disabled dark blue1*/
 .disabled {
-  filter: brightness(50%);
+  // filter: brightness(50%);
   cursor: initial;
+  opacity: 50%;
 }
 
 .loading {

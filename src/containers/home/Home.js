@@ -95,6 +95,7 @@ function Home () {
       : body.style.overflow = 'auto';
   }, [ mobileMenuOpen ]);
 
+
   useEffect(() => {
     for (const token of transactedTokens) {
       dispatch(getExitQueue(token));
